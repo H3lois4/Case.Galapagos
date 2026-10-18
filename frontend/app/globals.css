@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Por ELAS finance — tokens do design system
+   Azul dominante, acentos em rosa. Tema claro e escuro (segue o sistema,
+   com override por classe .dark no <html>).
+   ========================================================================== */
+
+:root {
+  --azul-elas: #1f4e9e;
+  --azul-elas-escuro: #163b78;
+  --azul-elas-suave: #e6edf8;
+  --rosa-elas: #eb839e;
+  --rosa-elas-texto: #b3365e;
+  --rosa-elas-suave: #fce8ee;
+  --cinza-logo: #dddddd;
+  --fundo: #ffffff;
+  --fundo-alt: #f6f5f8;
+  --tinta: #1a1d2b;
+  --tinta-suave: #5b6070;
+  --borda: #e3e2e7;
+  --sucesso: #1a7a4c;
+  --perigo: #c8323c;
+  --alerta: #9a6412;
+
+  --sombra-card: 0 1px 2px rgba(26, 29, 43, 0.06), 0 6px 20px rgba(26, 29, 43, 0.05);
+
+  --raio-chip: 8px;
+  --raio-botao: 12px;
+  --raio-card: 20px;
+  --raio-pill: 999px;
+}
+
+/* Tema escuro automático (preferência do sistema) */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --azul-elas: #6f98e0;
+    --azul-elas-escuro: #9dbbee;
+    --azul-elas-suave: #1b2742;
+    --rosa-elas: #eb839e;
+    --rosa-elas-texto: #f29bb2;
+    --rosa-elas-suave: #3a1f2a;
+    --cinza-logo: #2a2d38;
+    --fundo: #12141c;
+    --fundo-alt: #1c1f2a;
+    --tinta: #f2f2f5;
+    --tinta-suave: #a3a7b5;
+    --borda: #2e3240;
+    --sucesso: #4fc08d;
+    --perigo: #f2737b;
+    --alerta: #e3a64a;
+    --sombra-card: none;
+  }
+}
+
+/* Override manual por classe (caso a usuária force um tema) */
+:root.dark {
+  --azul-elas: #6f98e0;
+  --azul-elas-escuro: #9dbbee;
+  --azul-elas-suave: #1b2742;
+  --rosa-elas: #eb839e;
+  --rosa-elas-texto: #f29bb2;
+  --rosa-elas-suave: #3a1f2a;
+  --cinza-logo: #2a2d38;
+  --fundo: #12141c;
+  --fundo-alt: #1c1f2a;
+  --tinta: #f2f2f5;
+  --tinta-suave: #a3a7b5;
+  --borda: #2e3240;
+  --sucesso: #4fc08d;
+  --perigo: #f2737b;
+  --alerta: #e3a64a;
+  --sombra-card: none;
+}
+
+/* ==========================================================================
+   Mapeamento dos tokens para o Tailwind v4
+   ========================================================================== */
+@theme inline {
+  --color-azul-elas: var(--azul-elas);
+  --color-azul-elas-escuro: var(--azul-elas-escuro);
+  --color-azul-elas-suave: var(--azul-elas-suave);
+  --color-rosa-elas: var(--rosa-elas);
+  --color-rosa-elas-texto: var(--rosa-elas-texto);
+  --color-rosa-elas-suave: var(--rosa-elas-suave);
+  --color-cinza-logo: var(--cinza-logo);
+  --color-fundo: var(--fundo);
+  --color-fundo-alt: var(--fundo-alt);
+  --color-tinta: var(--tinta);
+  --color-tinta-suave: var(--tinta-suave);
+  --color-borda: var(--borda);
+  --color-sucesso: var(--sucesso);
+  --color-perigo: var(--perigo);
+  --color-alerta: var(--alerta);
+
+  --radius-chip: var(--raio-chip);
+  --radius-botao: var(--raio-botao);
+  --radius-card: var(--raio-card);
+  --radius-pill: var(--raio-pill);
+
+  --font-titulo: var(--font-montserrat);
+  --font-corpo: var(--font-inter);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+html {
+  background: var(--fundo);
+}
+
+body {
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.font-titulo {
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+}
+
+/* Foco visível e acessível em toda a interface */
+:focus-visible {
+  outline: 2px solid var(--azul-elas);
+  outline-offset: 2px;
+}
+
+/* Respeita quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

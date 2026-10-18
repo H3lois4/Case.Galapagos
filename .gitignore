@@ -1,0 +1,51 @@
+# ---- Segredos ----
+.env
+.env.*
+!.env.example
+
+# ---- Python / Django ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+db.sqlite3
+db.sqlite3-journal
+backend/staticfiles/
+backend/.vercel/
+
+# ---- Node / Next.js ----
+node_modules/
+.next/
+out/
+frontend/.vercel/
+dist/
+build/
+
+# ---- PWA gerado ----
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/swe-worker-*.js
+
+# ---- Arquivos de mídia pesados ----
+*.mp4
+*.mov
+*.webm
+*.avi
+*.mkv
+
+# ---- Logs / tempo de execução ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- Editores / SO ----
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
