@@ -199,10 +199,11 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
-    # A autenticação por JWT do Supabase entra na etapa 01-auth-perfis.
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "accounts.authentication.SupabaseJWTAuthentication",
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
+        "rest_framework.permissions.IsAuthenticated",
     ],
 }
 
@@ -236,3 +237,48 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = env_list(
         "CSRF_TRUSTED_ORIGINS", "https://*.vercel.app"
     )
+
+
+# ---------------------------------------------------------------------------
+# Supabase Auth (validação do JWT)
+# ---------------------------------------------------------------------------
+SUPABASE_PROJECT_URL = os.environ.get("SUPABASE_PROJECT_URL", "").rstrip("/")
+SUPABASE_JWT_AUD = os.environ.get("SUPABASE_JWT_AUD", "authenticated")
+SUPABASE_JWKS_TTL = int(os.environ.get("SUPABASE_JWKS_TTL", "600"))
+
+
+# ---------------------------------------------------------------------------
+# E-mail transacional (mesmo SMTP configurado no Supabase)
+# ---------------------------------------------------------------------------
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = os.environ.get(
+    "DEFAULT_FROM_EMAIL", "Por ELAS finance <no-reply@porelas.app>"
+)
+if EMAIL_HOST:
+    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+else:
+    # Sem SMTP configurado, imprime o e-mail no console (útil em dev).
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# ---------------------------------------------------------------------------
+# Regras de verificação de empresa
+# ---------------------------------------------------------------------------
+TERMOS_VERSAO = os.environ.get("TERMOS_VERSAO", "1.0")
+
+DOMINIOS_PRE_APROVADOS = [
+    d.lower() for d in env_list("DOMINIOS_PRE_APROVADOS", "galapagoscapital.com")
+]
+
+# Domínios de e-mail gratuitos bloqueados no cadastro de empresa.
+DOMINIOS_EMAIL_GRATUITOS = {
+    "gmail.com", "googlemail.com", "hotmail.com", "outlook.com", "live.com",
+    "msn.com", "yahoo.com", "yahoo.com.br", "ymail.com", "icloud.com", "me.com",
+    "bol.com.br", "uol.com.br", "terra.com.br", "ig.com.br", "globo.com",
+    "globomail.com", "zipmail.com.br", "aol.com", "proton.me", "protonmail.com",
+    "gmx.com", "yandex.com", "mail.com",
+}
