@@ -91,13 +91,37 @@ App em `http://localhost:3000` (redireciona para `/aulas`). A tela **Perfil** mo
 | `CSRF_TRUSTED_ORIGINS` | Origens confiáveis para CSRF do Admin em produção. |
 | `CRON_SECRET` | Segredo compartilhado com a Vercel Cron (usado em etapas futuras). |
 
+| `SUPABASE_PROJECT_URL` | URL do projeto Supabase (valida o JWT pelas chaves públicas). |
+| `SUPABASE_JWT_AUD` | Audiência do JWT (padrão `authenticated`). |
+| `SUPABASE_JWKS_TTL` | Cache das chaves públicas, em segundos (padrão 600). |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USE_TLS` | SMTP (o mesmo configurado no Supabase). |
+| `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` | Usuário e senha do SMTP (senha de app, no caso do Gmail). |
+| `DEFAULT_FROM_EMAIL` | Remetente dos e-mails do app. |
+| `DOMINIOS_PRE_APROVADOS` | Domínios de empresa que aprovam automaticamente após o código. |
+| `TERMOS_VERSAO` | Versão dos termos aceitos no cadastro. |
+
 ### `frontend/.env.example`
 
 | Variável | Descrição |
 | --- | --- |
 | `NEXT_PUBLIC_API_URL` | URL base da API Django. Dev: `http://localhost:8000`. Produção: URL do `por-elas-api`. |
+| `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave pública (publishable/anon) do Supabase. |
 
 > Nunca commite `.env` / `.env.local` com valores reais. Só os `*.env.example` ficam versionados.
+
+## Autenticação (Supabase)
+
+A autenticação é do **Supabase Auth** (Google e e-mail + senha). O Django valida o JWT pelas chaves públicas do projeto, sem guardar senhas, e cria o perfil local no primeiro acesso.
+
+Configuração do projeto Supabase (passo a passo completo em `.kiro/specs/01-auth-perfis/SETUP-SUPABASE.md`):
+
+1. Criar o projeto e pegar **Project URL** e **publishable/anon key**.
+2. Ativar **JWT Signing Keys assimétricas** (ES256/RS256) — confira em `/auth/v1/.well-known/jwks.json`.
+3. Habilitar os provedores **Email** e **Google** (com o redirect `https://SEU-PROJETO.supabase.co/auth/v1/callback` no Google Cloud).
+4. Configurar **URL de redirecionamento** (`http://localhost:3000/**` e a URL da Vercel).
+5. Configurar **SMTP próprio** (o sender padrão só manda 2 e-mails/hora) e subir o rate limit de e-mail.
+6. Pegar a **connection string** do banco pelo **pooler (porta 6543)** para o `DATABASE_URL`.
 
 ---
 
@@ -179,7 +203,7 @@ Case.Galapagos/
 ## Roadmap (specs)
 
 1. `00-fundacao` — base do monorepo, design system, navegação, PWA, health, deploy. ✅
-2. `01-auth-perfis` — Supabase Auth, perfis, username, verificação de empresa.
+2. `01-auth-perfis` — Supabase Auth, perfis, username, verificação de empresa. ✅
 3. `02-aulas` — aulas em vídeo, upload direto para o R2.
 4. `03-ia-base` — provedores de LLM, streaming, chat com voz.
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira.
