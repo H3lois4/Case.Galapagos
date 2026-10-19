@@ -13,6 +13,29 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def _carregar_env_local() -> None:
+    """Carrega backend/.env para os.environ em desenvolvimento.
+
+    Leve e sem dependência externa. Em produção (Vercel), as variáveis já
+    chegam pelo ambiente, então o arquivo não existe e nada acontece.
+    Não sobrescreve variáveis já definidas no ambiente.
+    """
+    env_path = BASE_DIR / ".env"
+    if not env_path.exists():
+        return
+    for linha in env_path.read_text(encoding="utf-8").splitlines():
+        linha = linha.strip()
+        if not linha or linha.startswith("#") or "=" not in linha:
+            continue
+        chave, _, valor = linha.partition("=")
+        chave = chave.strip()
+        valor = valor.strip().strip('"').strip("'")
+        os.environ.setdefault(chave, valor)
+
+
+_carregar_env_local()
+
+
 def env_bool(name: str, default: bool = False) -> bool:
     val = os.environ.get(name)
     if val is None:
