@@ -39,3 +39,37 @@ export async function getHealth(): Promise<HealthResponse> {
   }
   return (await res.json()) as HealthResponse;
 }
+
+/**
+ * Chamada autenticada: busca o token da sessão Supabase e envia como Bearer.
+ * Importa o supabase de forma dinâmica para manter este módulo utilizável no server.
+ */
+export async function apiAuth(
+  path: string,
+  opts: RequestInit = {},
+): Promise<Response> {
+  const { supabase } = await import("@/lib/supabase");
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token ?? null;
+  return apiFetch(path, { ...opts, token });
+}
+
+/** Helper que já devolve JSON e lança em erro != 2xx (com corpo). */
+export async function apiAuthJson<T = unknown>(
+  path: string,
+  opts: RequestInit = {},
+): Promise<T> {
+  const res = await apiAuth(path, opts);
+  const texto = await res.text();
+  const corpo = texto ? JSON.parse(texto) : null;
+  if (!res.ok) {
+    const erro = new Error(`API ${res.status}`) as Error & {
+      status?: number;
+      corpo?: unknown;
+    };
+    erro.status = res.status;
+    erro.corpo = corpo;
+    throw erro;
+  }
+  return corpo as T;
+}
