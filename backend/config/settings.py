@@ -248,6 +248,26 @@ SUPABASE_JWKS_TTL = int(os.environ.get("SUPABASE_JWKS_TTL", "600"))
 
 
 # ---------------------------------------------------------------------------
+# Cloudflare R2 (armazenamento de vídeos e imagens, compatível com S3)
+# ---------------------------------------------------------------------------
+R2_ACCOUNT_ID = os.environ.get("R2_ACCOUNT_ID", "")
+R2_ACCESS_KEY_ID = os.environ.get("R2_ACCESS_KEY_ID", "")
+R2_SECRET_ACCESS_KEY = os.environ.get("R2_SECRET_ACCESS_KEY", "")
+R2_BUCKET = os.environ.get("R2_BUCKET", "")
+# Endpoint S3; se vazio, é derivado do account id no cliente.
+R2_ENDPOINT = os.environ.get("R2_ENDPOINT", "")
+# URL pública de leitura do bucket (subdomínio r2.dev ou domínio próprio).
+R2_PUBLIC_BASE_URL = os.environ.get("R2_PUBLIC_BASE_URL", "").rstrip("/")
+
+# Limites de upload
+UPLOAD_VIDEO_MAX_BYTES = int(os.environ.get("UPLOAD_VIDEO_MAX_BYTES", 209_715_200))  # 200 MB
+UPLOAD_IMG_MAX_BYTES = int(os.environ.get("UPLOAD_IMG_MAX_BYTES", 5_242_880))  # 5 MB
+UPLOAD_URL_TTL = int(os.environ.get("UPLOAD_URL_TTL", 600))  # 10 min
+# Duração máxima de vídeo (validada no cliente; referência para o front).
+UPLOAD_VIDEO_MAX_SEG = int(os.environ.get("UPLOAD_VIDEO_MAX_SEG", 600))  # 10 min
+
+
+# ---------------------------------------------------------------------------
 # E-mail transacional (mesmo SMTP configurado no Supabase)
 # ---------------------------------------------------------------------------
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")

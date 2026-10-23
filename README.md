@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapa **00-fundacao** concluída (esqueleto do app, design system, navegação, PWA, `/api/health/`). As funcionalidades de produto chegam nas próximas etapas (ver `.kiro/specs/`).
+> Status: etapas **00-fundacao**, **01-auth-perfis** e **02-aulas** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, e aulas em vídeo com upload direto para o R2). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
 
 ---
 
@@ -99,6 +99,13 @@ App em `http://localhost:3000` (redireciona para `/aulas`). A tela **Perfil** mo
 | `DEFAULT_FROM_EMAIL` | Remetente dos e-mails do app. |
 | `DOMINIOS_PRE_APROVADOS` | Domínios de empresa que aprovam automaticamente após o código. |
 | `TERMOS_VERSAO` | Versão dos termos aceitos no cadastro. |
+| `R2_ACCOUNT_ID` | Account ID da Cloudflare (monta o endpoint S3 do R2). |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | Credenciais do token S3 do R2 (sensíveis). |
+| `R2_BUCKET` | Nome do bucket (ex.: `por-elas-media`). |
+| `R2_ENDPOINT` | Endpoint S3 (opcional; derivado do account id se vazio). |
+| `R2_PUBLIC_BASE_URL` | URL pública de leitura do bucket (ex.: `https://pub-xxxx.r2.dev`). |
+| `UPLOAD_VIDEO_MAX_BYTES` / `UPLOAD_IMG_MAX_BYTES` | Limites de tamanho (padrão 200 MB / 5 MB). |
+| `UPLOAD_URL_TTL` / `UPLOAD_VIDEO_MAX_SEG` | Expiração da URL pré-assinada e duração máxima do vídeo. |
 
 ### `frontend/.env.example`
 
@@ -122,6 +129,18 @@ Configuração do projeto Supabase (passo a passo completo em `.kiro/specs/01-au
 4. Configurar **URL de redirecionamento** (`http://localhost:3000/**` e a URL da Vercel).
 5. Configurar **SMTP próprio** (o sender padrão só manda 2 e-mails/hora) e subir o rate limit de e-mail.
 6. Pegar a **connection string** do banco pelo **pooler (porta 6543)** para o `DATABASE_URL`.
+
+## Armazenamento de mídia (Cloudflare R2)
+
+As aulas em vídeo (e as capas/thumbnails) ficam no **Cloudflare R2** (compatível com S3, plano gratuito). O upload vai **direto do navegador para o R2** usando uma URL pré-assinada que o Django gera com `boto3` — o arquivo nunca passa pelo backend (as funções serverless têm limite de tamanho de requisição). O player lê o vídeo pela URL pública do bucket.
+
+Passo a passo completo (ativar R2, criar bucket, token S3, bucket público e CORS) em `.kiro/specs/02-aulas/SETUP-R2.md`. Ao final, preencha no `backend/.env`:
+
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`, `R2_PUBLIC_BASE_URL`.
+
+Limites padrão: vídeo até **200 MB** e **10 min** (`video/mp4` ou `video/webm`); capa até **5 MB** (JPG/PNG/WebP). A URL pré-assinada expira em **10 min** e só é gerada para usuárias de **empresa aprovada**.
+
+> Sem as variáveis `R2_*`, a tela de aulas continua funcionando (listagem e player de aulas já cadastradas); apenas o upload responde `503` até configurar o R2.
 
 ---
 
@@ -204,7 +223,7 @@ Case.Galapagos/
 
 1. `00-fundacao` — base do monorepo, design system, navegação, PWA, health, deploy. ✅
 2. `01-auth-perfis` — Supabase Auth, perfis, username, verificação de empresa. ✅
-3. `02-aulas` — aulas em vídeo, upload direto para o R2.
+3. `02-aulas` — aulas em vídeo, upload direto para o R2. ✅
 4. `03-ia-base` — provedores de LLM, streaming, chat com voz.
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira.
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda.
