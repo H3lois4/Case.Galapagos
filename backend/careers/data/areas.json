@@ -1,0 +1,153 @@
+[
+  {
+    "slug": "investment-banking",
+    "nome": "Investment Banking",
+    "resumo": "Assessoria em captação de recursos e fusões e aquisições (DCM, ECM, M&A).",
+    "descricao": "O Investment Banking (banco de investimento) assessora empresas e governos a captar recursos e a estruturar grandes operações. Divide-se em DCM (dívida), ECM (ações) e M&A (fusões e aquisições). É uma área de ritmo intenso, muito analítica e com forte trabalho em equipe.",
+    "formacao": "Graduação em Economia, Administração, Engenharia, Contabilidade ou áreas correlatas. Inglês fluente é muito valorizado.",
+    "certificacoes": ["CPA-20", "CEA", "CFA"],
+    "hard_skills": ["Modelagem financeira (Excel)", "Valuation", "Contabilidade", "PowerPoint para pitch", "Inglês"],
+    "soft_skills": ["Resiliência", "Atenção a detalhes", "Comunicação", "Trabalho sob pressão"],
+    "cargos_entrada": ["Estágio", "Analista"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista de M&A", "linkedin": "https://www.linkedin.com/"},
+      {"nome": "Mentora (exemplo)", "cargo": "Associate de ECM", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 1
+  },
+  {
+    "slug": "asset-management",
+    "nome": "Asset Management",
+    "resumo": "Gestão de fundos e carteiras de investimento para clientes e instituições.",
+    "descricao": "Asset Management é a gestão profissional de recursos de terceiros em fundos e carteiras. Envolve decisões de alocação, análise de ativos e acompanhamento de desempenho, sempre dentro do mandato de cada fundo.",
+    "formacao": "Economia, Administração, Engenharia ou áreas quantitativas. Pós e certificações contam pontos.",
+    "certificacoes": ["CPA-20", "CGA", "CFA"],
+    "hard_skills": ["Análise de investimentos", "Estatística", "Gestão de risco", "Excel/Python"],
+    "soft_skills": ["Disciplina", "Pensamento crítico", "Visão de longo prazo"],
+    "cargos_entrada": ["Estágio", "Analista de investimentos"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Gestora de fundos", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 2
+  },
+  {
+    "slug": "wealth-management",
+    "nome": "Wealth Management / Private",
+    "resumo": "Planejamento e gestão patrimonial para pessoas físicas de alta renda.",
+    "descricao": "Wealth Management (ou Private Banking) cuida do patrimônio de famílias e indivíduos de alta renda, com planejamento financeiro, sucessório e tributário, além de recomendação de investimentos conforme o perfil.",
+    "formacao": "Administração, Economia, Direito ou Contabilidade. Boa comunicação é essencial.",
+    "certificacoes": ["CPA-20", "CEA", "CFP"],
+    "hard_skills": ["Planejamento financeiro", "Produtos de investimento", "Noções de tributação e sucessão"],
+    "soft_skills": ["Relacionamento", "Escuta ativa", "Confiança", "Ética"],
+    "cargos_entrada": ["Assistente", "Banker júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Private Banker", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 3
+  },
+  {
+    "slug": "tecnologia",
+    "nome": "Tecnologia",
+    "resumo": "Desenvolvimento de sistemas, dados e produtos digitais no mercado financeiro.",
+    "descricao": "A área de Tecnologia no mercado financeiro constrói as plataformas de investimento, sistemas de negociação, dados e segurança. Tem forte demanda e muitos pontos de entrada para quem vem de computação ou está em transição.",
+    "formacao": "Ciência da Computação, Engenharia, Sistemas de Informação ou formação por bootcamp/autodidata com portfólio.",
+    "certificacoes": ["Certificações cloud (AWS/Azure)", "Cursos de dados/engenharia"],
+    "hard_skills": ["Programação (Python/Java)", "Bancos de dados", "APIs", "Versionamento (Git)"],
+    "soft_skills": ["Resolução de problemas", "Colaboração", "Aprendizado contínuo"],
+    "cargos_entrada": ["Estágio", "Desenvolvedora júnior", "Analista de dados júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Engenheira de software", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 4
+  },
+  {
+    "slug": "trading",
+    "nome": "Trading / Sales & Trading",
+    "resumo": "Negociação de ativos e atendimento de clientes institucionais.",
+    "descricao": "Sales & Trading cuida da compra e venda de ativos (ações, renda fixa, câmbio, derivativos) e do relacionamento com clientes institucionais. É uma área rápida, orientada a mercado e a decisões sob pressão.",
+    "formacao": "Economia, Engenharia, Matemática ou áreas quantitativas. Raciocínio rápido conta muito.",
+    "certificacoes": ["CPA-20", "CEA", "CFA"],
+    "hard_skills": ["Produtos de mercado", "Estatística", "Leitura de mercado", "Excel"],
+    "soft_skills": ["Agilidade", "Controle emocional", "Comunicação direta"],
+    "cargos_entrada": ["Estágio", "Trainee de mesa"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Trader", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 5
+  },
+  {
+    "slug": "quant",
+    "nome": "Quant",
+    "resumo": "Modelos matemáticos e estatísticos para preços, risco e estratégias.",
+    "descricao": "A área Quantitativa (Quant) cria modelos matemáticos e estatísticos para precificação, gestão de risco e estratégias automatizadas. Combina finanças, matemática e programação.",
+    "formacao": "Matemática, Física, Estatística, Engenharia ou Computação; pós-graduação é comum.",
+    "certificacoes": ["CFA", "FRM"],
+    "hard_skills": ["Cálculo e probabilidade", "Programação (Python/C++)", "Modelagem estocástica", "Machine learning"],
+    "soft_skills": ["Rigor analítico", "Curiosidade", "Comunicação de ideias complexas"],
+    "cargos_entrada": ["Estágio quant", "Analista quantitativo júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista quantitativa", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 6
+  },
+  {
+    "slug": "research",
+    "nome": "Research / Análise",
+    "resumo": "Análise de empresas, setores e economia para embasar decisões.",
+    "descricao": "Research produz análises sobre empresas, setores e cenário macroeconômico, com relatórios e recomendações que embasam decisões de investimento. Exige escrita clara e profundidade analítica.",
+    "formacao": "Economia, Administração, Contabilidade ou Engenharia. Boa escrita é diferencial.",
+    "certificacoes": ["CNPI", "CFA"],
+    "hard_skills": ["Análise de demonstrações", "Valuation", "Pesquisa setorial", "Escrita de relatórios"],
+    "soft_skills": ["Pensamento crítico", "Comunicação escrita", "Curiosidade"],
+    "cargos_entrada": ["Estágio", "Analista júnior de research"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista de research", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 7
+  },
+  {
+    "slug": "risco-compliance",
+    "nome": "Risco & Compliance",
+    "resumo": "Gestão de riscos e conformidade com normas e regulação.",
+    "descricao": "Risco & Compliance protege a instituição: mede e controla riscos (mercado, crédito, operacional) e garante que tudo esteja em conformidade com leis e regulação. Área em alta com a agenda regulatória.",
+    "formacao": "Economia, Administração, Direito, Engenharia ou Contabilidade.",
+    "certificacoes": ["FRM", "CPA-20", "Certificações de compliance (ex.: CPC)"],
+    "hard_skills": ["Gestão de risco", "Regulação (CVM, BC)", "Controles internos", "Análise de dados"],
+    "soft_skills": ["Ética", "Atenção a detalhes", "Firmeza", "Comunicação"],
+    "cargos_entrada": ["Estágio", "Analista de risco/compliance júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista de Compliance", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 8
+  },
+  {
+    "slug": "credito",
+    "nome": "Crédito",
+    "resumo": "Análise e estruturação de operações de crédito e financiamento.",
+    "descricao": "A área de Crédito avalia a capacidade de pagamento de empresas e pessoas, estrutura operações e acompanha a carteira. Mistura análise financeira, risco e relacionamento.",
+    "formacao": "Economia, Administração, Contabilidade ou Engenharia.",
+    "certificacoes": ["CPA-20", "FRM"],
+    "hard_skills": ["Análise de crédito", "Demonstrações financeiras", "Modelagem", "Noções de garantias"],
+    "soft_skills": ["Julgamento", "Atenção a detalhes", "Negociação"],
+    "cargos_entrada": ["Estágio", "Analista de crédito júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista de Crédito", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 9
+  },
+  {
+    "slug": "relacoes-com-investidores",
+    "nome": "Relações com Investidores",
+    "resumo": "Comunicação entre a empresa e o mercado de capitais.",
+    "descricao": "Relações com Investidores (RI) é a ponte entre a empresa de capital aberto e o mercado: divulga resultados, atende analistas e investidores e cuida da narrativa da companhia. Une finanças e comunicação.",
+    "formacao": "Administração, Economia, Contabilidade, Comunicação ou Relações Públicas.",
+    "certificacoes": ["CPA-20", "Cursos de RI (IBRI)"],
+    "hard_skills": ["Análise financeira", "Regulação de mercado de capitais", "Comunicação corporativa", "Inglês"],
+    "soft_skills": ["Comunicação", "Organização", "Diplomacia"],
+    "cargos_entrada": ["Estágio", "Analista de RI júnior"],
+    "mulheres": [
+      {"nome": "Mentora (exemplo)", "cargo": "Analista de RI", "linkedin": "https://www.linkedin.com/"}
+    ],
+    "ordem": 10
+  }
+]

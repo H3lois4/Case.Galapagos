@@ -8,14 +8,16 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ApiStatusBadge } from "@/components/diagnostico/ApiStatusBadge";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
 import { apiAuth, apiAuthJson } from "@/lib/api";
-import type { Me } from "@/lib/types";
+import type { Me, PlanoCarreira } from "@/lib/types";
 import { LogOut, Trash2, Building2, Loader2 } from "lucide-react";
 
 export default function PerfilPage() {
   const router = useRouter();
   const { signOut } = useAuth();
   const [me, setMe] = useState<Me | null>(null);
+  const [plano, setPlano] = useState<PlanoCarreira | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
@@ -31,6 +33,10 @@ export default function PerfilPage() {
         });
       })
       .finally(() => setCarregando(false));
+    // Plano de carreira (pode não existir → 404, ignorado)
+    apiAuthJson<PlanoCarreira>("/api/carreira/plano/")
+      .then(setPlano)
+      .catch(() => setPlano(null));
   }, []);
 
   async function salvar(e: React.FormEvent) {
@@ -179,11 +185,26 @@ export default function PerfilPage() {
         </form>
       </Card>
 
-      {/* Seções reservadas (próximas etapas) */}
+      {/* Minha jornada */}
       <Card>
         <h2 className="font-titulo text-[18px] font-semibold text-tinta">Minha jornada</h2>
-        <ul className="mt-2 space-y-1 text-[14px] text-tinta-suave">
-          <li>Plano de carreira — em breve (etapa Carreira)</li>
+        <div className="mt-3">
+          <h3 className="text-[14px] font-semibold text-tinta">Plano de carreira</h3>
+          {plano ? (
+            <div className="mt-2">
+              <PlanoChecklist plano={plano} onMudou={setPlano} />
+            </div>
+          ) : (
+            <p className="mt-1 text-[13px] text-tinta-suave">
+              Você ainda não tem um plano.{" "}
+              <Link href="/carreira" className="font-semibold text-azul-elas hover:underline">
+                Montar com a IA de carreira
+              </Link>
+              .
+            </p>
+          )}
+        </div>
+        <ul className="mt-4 space-y-1 text-[14px] text-tinta-suave">
           <li>Minhas mentorias — em breve (etapa Mentoria)</li>
           <li>Histórico de entrevistas e simulados — em breve (etapa Prática)</li>
         </ul>

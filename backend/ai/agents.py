@@ -59,7 +59,14 @@ AGENTES: dict[str, Agente] = {
             knowledge_dir="assistente",
             temperatura=0.6,
         ),
-        # Carreira, mentora e entrevistadora entram nas etapas 04–06 adicionando
+        Agente(
+            chave="carreira",
+            nome="IA de carreira",
+            prompt_file="carreira.md",
+            knowledge_dir="carreira",
+            temperatura=0.7,
+        ),
+        # Mentora e entrevistadora entram nas etapas 05–06 adicionando
         # arquivos de prompt/conhecimento e uma entrada aqui.
     ]
 }

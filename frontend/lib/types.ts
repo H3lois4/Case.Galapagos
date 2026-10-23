@@ -122,3 +122,56 @@ export interface AgenteIA {
   chave: string;
   nome: string;
 }
+
+// ---------------------------------------------------------------------------
+// Carreira (etapa 04-carreira)
+// ---------------------------------------------------------------------------
+
+export interface MulherReferencia {
+  nome: string;
+  cargo: string;
+  linkedin: string;
+}
+
+export interface AreaResumo {
+  slug: string;
+  nome: string;
+  resumo: string;
+  ordem: number;
+}
+
+export interface AreaDetalhe {
+  slug: string;
+  nome: string;
+  resumo: string;
+  descricao: string;
+  formacao: string;
+  certificacoes: string[];
+  hard_skills: string[];
+  soft_skills: string[];
+  cargos_entrada: string[];
+  mulheres: MulherReferencia[];
+}
+
+export interface PassoPlano {
+  id: number;
+  titulo: string;
+  descricao: string;
+  prazo: string;
+  concluido: boolean;
+}
+
+export interface PlanoCarreira {
+  titulo: string;
+  passos: PassoPlano[];
+  total_passos: number;
+  concluidos: number;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+/** Rascunho vindo de /plano/gerar/ (ainda não salvo). */
+export interface PlanoRascunho {
+  titulo: string;
+  passos: PassoPlano[];
+}

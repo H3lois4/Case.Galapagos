@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas** e **03-ia-base** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, e a fundação de IA — LLM trocável com streaming e chat por voz). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
+> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base** e **04-carreira** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, a fundação de IA — LLM trocável com streaming e chat por voz — e a tela de Carreira com áreas do mercado, PDF e IA de planejamento). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
 
 ---
 
@@ -221,9 +221,23 @@ O plano free do Supabase pausa após ~1 semana sem uso. Uma Vercel Cron diária 
 
 ---
 
+## Carreira (áreas e IA)
+
+A tela **Carreira** tem um guia das áreas do mercado financeiro e a **IA de carreira** (agente sobre a base da etapa 03).
+
+- **Áreas:** o conteúdo vem de um seed editável em `backend/careers/data/areas.json`. Para popular/atualizar o banco:
+  ```bash
+  cd backend
+  python manage.py seed_areas   # idempotente (upsert por slug; não apaga planos)
+  ```
+  Para editar uma área (descrição, certificações, skills, mulheres de referência), ajuste o JSON e rode de novo, ou edite direto no Django Admin.
+- **Mulheres de referência:** os links de LinkedIn no seed são **placeholders** (`https://www.linkedin.com/`) — troque pelos perfis reais quando tiver.
+- **IA de carreira:** prompt em `backend/ai/prompts/carreira.md` e conhecimento em `backend/ai/knowledge/carreira/`. A usuária pode gerar um **plano de carreira** (checklist no Perfil). Depende da `GEMINI_API_KEY` (ver seção de IA).
+- **PDF das áreas:** gerado no navegador (jsPDF), com a identidade visual do app.
+
 ## Seed de demonstração
 
-O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui.
+O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui. (As áreas de carreira já têm o seed próprio `seed_areas`, acima.)
 
 ---
 
@@ -254,7 +268,7 @@ Case.Galapagos/
 2. `01-auth-perfis` — Supabase Auth, perfis, username, verificação de empresa. ✅
 3. `02-aulas` — aulas em vídeo, upload direto para o R2. ✅
 4. `03-ia-base` — provedores de LLM, streaming, chat com voz. ✅
-5. `04-carreira` — áreas do mercado, PDF, IA de carreira.
+5. `04-carreira` — áreas do mercado, PDF, IA de carreira. ✅
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda.
 7. `06-pratica` — entrevista com IA e simulados.
 8. `07-rede` — posts, notícias, carrossel, IA de notícias.
