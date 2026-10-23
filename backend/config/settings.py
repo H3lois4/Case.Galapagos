@@ -283,6 +283,13 @@ AI_RATE_LIMIT_PER_HOUR = int(os.environ.get("AI_RATE_LIMIT_PER_HOUR", "30"))
 AI_MAX_HISTORY = int(os.environ.get("AI_MAX_HISTORY", "20"))
 AI_REQUEST_TIMEOUT = int(os.environ.get("AI_REQUEST_TIMEOUT", "60"))
 
+# IA de notícias (Rede) — feeds RSS e limite por execução.
+NEWS_FEEDS = os.environ.get(
+    "NEWS_FEEDS",
+    "https://www.infomoney.com.br/feed/,https://valor.globo.com/rss/",
+)
+NEWS_MAX_POR_RUN = int(os.environ.get("NEWS_MAX_POR_RUN", "3"))
+
 
 # ---------------------------------------------------------------------------
 # Google Agenda (mentoria) — opcional

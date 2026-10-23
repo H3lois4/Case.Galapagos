@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base**, **04-carreira**, **05-mentoria** e **06-pratica** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo no R2, a fundação de IA, a Carreira com áreas/PDF/plano, a Mentoria com agenda segura + Google Agenda, e a Prática com simulados e entrevista com IA). Faltam a Rede (07) e o seed/polimento final (08) — ver `.kiro/specs/`.
+> Status: etapas **00** a **07** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo no R2, a fundação de IA, a Carreira com áreas/PDF/plano, a Mentoria com agenda segura + Google Agenda, a Prática com simulados e entrevista com IA, e a Rede com feed, interações sociais e IA de notícias). Falta o seed/polimento final (08) — ver `.kiro/specs/`.
 
 ---
 
@@ -102,6 +102,8 @@ App em `http://localhost:3000` (redireciona para `/aulas`). A tela **Perfil** mo
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth da conta Google da plataforma (mentoria). |
 | `GOOGLE_REFRESH_TOKEN` | Refresh token com escopo `calendar.events`. |
 | `GOOGLE_CALENDAR_ID` | Agenda usada (padrão `primary`). |
+| `NEWS_FEEDS` | Feeds RSS da IA de notícias (csv de URLs). |
+| `NEWS_MAX_POR_RUN` | Máximo de notícias geradas por execução da cron (padrão 3). |
 | `R2_ACCOUNT_ID` | Account ID da Cloudflare (monta o endpoint S3 do R2). |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | Credenciais do token S3 do R2 (sensíveis). |
 | `R2_BUCKET` | Nome do bucket (ex.: `por-elas-media`). |
@@ -271,6 +273,28 @@ A tela **Prática** tem duas ferramentas:
 
 O histórico de simulados e entrevistas aparece no **Perfil**, em "Minha jornada".
 
+## Rede (feed e IA de notícias)
+
+A tela **Rede** tem um carrossel de notícias, um feed de posts (comum, vaga e notícia) e interações sociais:
+
+- Qualquer usuária publica **posts** (texto até 2.000 caracteres + imagem opcional, enviada direto ao R2). Empresa aprovada publica também **vagas** e **notícias**.
+- **Curtir, comentar, seguir** (reusa o grafo de "seguir") e **compartilhar** (Web Share API com fallback "copiar link"). Cada post tem uma página pública `/post/[id]` com Open Graph para pré-visualização em redes.
+- Filtros do feed: Todos / Quem eu sigo / Vagas.
+
+### IA de notícias (job diário)
+
+Uma IA publica resumos de notícias do mercado, **reescritos com palavras próprias** (sem copiar), a partir de feeds RSS configuráveis. Publica como posts do tipo notícia da conta oficial "Por ELAS".
+
+- Feeds em `NEWS_FEEDS` (csv de URLs) e limite por execução em `NEWS_MAX_POR_RUN`.
+- Endpoint protegido: `POST /api/ai/news/run/` exige o segredo em `CRON_SECRET` (header `X-Cron-Secret` ou `?secret=`). Sem `CRON_SECRET`/`GEMINI_API_KEY`, degrada (não publica).
+- Em produção, uma **Vercel Cron** diária (no `vercel.json` do `por-elas-api`) chama esse endpoint.
+- Para a demonstração, dá para rodar manualmente:
+  ```bash
+  cd backend
+  python manage.py run_news
+  ```
+  (ou pela action "Rodar IA de notícias agora" no Django Admin, em Posts). Depende da `GEMINI_API_KEY` (ver seção de IA).
+
 ## Seed de demonstração
 
 O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui. (As áreas de carreira já têm o seed próprio `seed_areas`, acima.)
@@ -307,5 +331,5 @@ Case.Galapagos/
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira. ✅
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda. ✅
 7. `06-pratica` — entrevista com IA e simulados. ✅
-8. `07-rede` — posts, notícias, carrossel, IA de notícias.
+8. `07-rede` — posts, notícias, carrossel, IA de notícias. ✅
 9. `08-seed-e-polimento` — `seed_demo` e revisão final.

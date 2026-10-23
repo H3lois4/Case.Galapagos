@@ -4,14 +4,16 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { PostCard } from "@/components/rede/PostCard";
 import { apiAuth, apiAuthJson } from "@/lib/api";
-import type { PerfilPublico } from "@/lib/types";
+import type { PerfilPublico, Pagina, Post } from "@/lib/types";
 import { ExternalLink, Loader2, Building2 } from "lucide-react";
 
 export default function PerfilPublicoPage() {
   const params = useParams<{ username: string }>();
   const username = params.username;
   const [perfil, setPerfil] = useState<PerfilPublico | null>(null);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [naoEncontrado, setNaoEncontrado] = useState(false);
   const [processando, setProcessando] = useState(false);
@@ -21,6 +23,9 @@ export default function PerfilPublicoPage() {
       .then(setPerfil)
       .catch(() => setNaoEncontrado(true))
       .finally(() => setCarregando(false));
+    apiAuthJson<Pagina<Post>>(`/api/rede/posts/?autor=${encodeURIComponent(username)}`)
+      .then((r) => setPosts(r.results))
+      .catch(() => setPosts([]));
   }, [username]);
 
   async function alternarSeguir() {
@@ -141,9 +146,22 @@ export default function PerfilPublicoPage() {
         </Card>
       )}
 
-      <p className="text-center text-[13px] text-tinta-suave">
-        Os posts desta pessoa aparecem aqui na etapa da Rede.
-      </p>
+      <div>
+        <h2 className="mb-3 font-titulo text-[18px] font-semibold text-tinta">Posts</h2>
+        {posts.length === 0 ? (
+          <p className="text-[13px] text-tinta-suave">Nenhum post ainda.</p>
+        ) : (
+          <div className="space-y-4">
+            {posts.map((p) => (
+              <PostCard
+                key={p.id}
+                post={p}
+                onExcluido={(id) => setPosts((atual) => atual.filter((x) => x.id !== id))}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

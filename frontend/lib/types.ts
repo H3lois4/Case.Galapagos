@@ -291,3 +291,49 @@ export interface EntrevistaHistorico {
   criado_em: string;
   finalizado_em: string | null;
 }
+
+// ---------------------------------------------------------------------------
+// Rede (etapa 07-rede)
+// ---------------------------------------------------------------------------
+
+export type TipoPost = "post" | "vaga" | "noticia";
+export type TipoAutor = "usuaria" | "empresa" | "ia";
+
+export interface AutorPost {
+  tipo: TipoAutor;
+  nome: string;
+  username: string | null;
+  slug: string | null;
+  foto: string;
+}
+
+export interface Post {
+  id: number;
+  tipo: TipoPost;
+  origem_ia: boolean;
+  autor: AutorPost;
+  texto: string;
+  imagem_url: string;
+  vaga_cargo: string;
+  vaga_local: string;
+  vaga_link: string;
+  titulo: string;
+  categoria: string;
+  fonte_url: string;
+  curtidas_count: number;
+  comentarios_count: number;
+  curtiu: boolean;
+  pode_excluir: boolean;
+  criado_em: string;
+}
+
+export interface ComentarioPost {
+  id: number;
+  texto: string;
+  autor_username: string | null;
+  autor_nome: string;
+  criado_em: string;
+  pode_excluir: boolean;
+}
+
+export type FiltroFeed = "todos" | "seguindo" | "vagas";
