@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base** e **04-carreira** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, a fundação de IA — LLM trocável com streaming e chat por voz — e a tela de Carreira com áreas do mercado, PDF e IA de planejamento). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
+> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base**, **04-carreira** e **05-mentoria** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, a fundação de IA, a tela de Carreira com áreas/PDF/plano, e a Mentoria com IA mentora e agenda com concorrência segura + Google Agenda). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
 
 ---
 
@@ -99,6 +99,9 @@ App em `http://localhost:3000` (redireciona para `/aulas`). A tela **Perfil** mo
 | `DEFAULT_FROM_EMAIL` | Remetente dos e-mails do app. |
 | `DOMINIOS_PRE_APROVADOS` | Domínios de empresa que aprovam automaticamente após o código. |
 | `TERMOS_VERSAO` | Versão dos termos aceitos no cadastro. |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | OAuth da conta Google da plataforma (mentoria). |
+| `GOOGLE_REFRESH_TOKEN` | Refresh token com escopo `calendar.events`. |
+| `GOOGLE_CALENDAR_ID` | Agenda usada (padrão `primary`). |
 | `R2_ACCOUNT_ID` | Account ID da Cloudflare (monta o endpoint S3 do R2). |
 | `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | Credenciais do token S3 do R2 (sensíveis). |
 | `R2_BUCKET` | Nome do bucket (ex.: `por-elas-media`). |
@@ -235,6 +238,25 @@ A tela **Carreira** tem um guia das áreas do mercado financeiro e a **IA de car
 - **IA de carreira:** prompt em `backend/ai/prompts/carreira.md` e conhecimento em `backend/ai/knowledge/carreira/`. A usuária pode gerar um **plano de carreira** (checklist no Perfil). Depende da `GEMINI_API_KEY` (ver seção de IA).
 - **PDF das áreas:** gerado no navegador (jsPDF), com a identidade visual do app.
 
+## Mentoria (agenda e Google Agenda)
+
+A tela **Mentoria** tem a **IA mentora** (agente sobre a base da etapa 03) e uma **agenda**:
+
+- Empresas aprovadas cadastram horários; usuárias agendam por **ordem de chegada** (a primeira que confirmar leva), com **limite de 1 mentoria por mês** e cancelamento **até 24 h antes**. O agendamento é atômico (`select_for_update` + constraints no banco), então não há reserva dupla mesmo com acessos simultâneos.
+- Ao confirmar, o sistema cria um evento no **Google Agenda** da plataforma (com link do Meet) e envia e-mail de confirmação.
+
+### Google Agenda (opcional)
+
+A integração usa OAuth da **conta Google da plataforma** (um refresh token em variável de ambiente). Passos para obter as credenciais:
+
+1. No Google Cloud Console, crie um projeto e ative a **Google Calendar API**.
+2. Configure a tela de consentimento OAuth e crie uma credencial **OAuth Client ID** (tipo "Desktop" ou "Web").
+3. Gere um **refresh token** para a conta da plataforma com o escopo `https://www.googleapis.com/auth/calendar.events` (ex.: via OAuth Playground).
+4. Preencha no `backend/.env`:
+   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `GOOGLE_CALENDAR_ID` (padrão `primary`).
+
+> **Sem essas variáveis, a mentoria funciona normalmente** — apenas não cria o evento/convite no Calendar (degradação graciosa). A IA mentora depende da `GEMINI_API_KEY` (ver seção de IA).
+
 ## Seed de demonstração
 
 O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui. (As áreas de carreira já têm o seed próprio `seed_areas`, acima.)
@@ -269,7 +291,7 @@ Case.Galapagos/
 3. `02-aulas` — aulas em vídeo, upload direto para o R2. ✅
 4. `03-ia-base` — provedores de LLM, streaming, chat com voz. ✅
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira. ✅
-6. `05-mentoria` — agenda com concorrência segura, Google Agenda.
+6. `05-mentoria` — agenda com concorrência segura, Google Agenda. ✅
 7. `06-pratica` — entrevista com IA e simulados.
 8. `07-rede` — posts, notícias, carrossel, IA de notícias.
 9. `08-seed-e-polimento` — `seed_demo` e revisão final.

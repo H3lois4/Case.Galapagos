@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/Input";
 import { ApiStatusBadge } from "@/components/diagnostico/ApiStatusBadge";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
+import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
 import { apiAuth, apiAuthJson } from "@/lib/api";
-import type { Me, PlanoCarreira } from "@/lib/types";
+import type { Me, Mentoria, PlanoCarreira } from "@/lib/types";
 import { LogOut, Trash2, Building2, Loader2 } from "lucide-react";
 
 export default function PerfilPage() {
@@ -18,6 +19,7 @@ export default function PerfilPage() {
   const { signOut } = useAuth();
   const [me, setMe] = useState<Me | null>(null);
   const [plano, setPlano] = useState<PlanoCarreira | null>(null);
+  const [mentorias, setMentorias] = useState<Mentoria[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
@@ -37,6 +39,10 @@ export default function PerfilPage() {
     apiAuthJson<PlanoCarreira>("/api/carreira/plano/")
       .then(setPlano)
       .catch(() => setPlano(null));
+    // Minhas mentorias
+    apiAuthJson<Mentoria[]>("/api/mentoria/minhas/")
+      .then(setMentorias)
+      .catch(() => setMentorias([]));
   }, []);
 
   async function salvar(e: React.FormEvent) {
@@ -204,8 +210,13 @@ export default function PerfilPage() {
             </p>
           )}
         </div>
+        <div className="mt-4">
+          <h3 className="text-[14px] font-semibold text-tinta">Minhas mentorias</h3>
+          <div className="mt-2">
+            <MinhasMentorias mentorias={mentorias} onMudou={setMentorias} compacto />
+          </div>
+        </div>
         <ul className="mt-4 space-y-1 text-[14px] text-tinta-suave">
-          <li>Minhas mentorias — em breve (etapa Mentoria)</li>
           <li>Histórico de entrevistas e simulados — em breve (etapa Prática)</li>
         </ul>
       </Card>

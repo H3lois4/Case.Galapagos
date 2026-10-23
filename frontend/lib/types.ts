@@ -175,3 +175,31 @@ export interface PlanoRascunho {
   titulo: string;
   passos: PassoPlano[];
 }
+
+// ---------------------------------------------------------------------------
+// Mentoria (etapa 05-mentoria)
+// ---------------------------------------------------------------------------
+
+export interface MentoriaSlot {
+  id: number;
+  empresa_nome: string;
+  empresa_slug: string;
+  mentora_nome: string;
+  mentora_cargo: string;
+  tema: string;
+  inicio: string;
+  duracao_min: number;
+  reservado: boolean;
+}
+
+export type StatusMentoria = "ativa" | "cancelada";
+
+export interface Mentoria {
+  id: number;
+  slot: MentoriaSlot;
+  status: StatusMentoria;
+  meet_link: string;
+  criado_em: string;
+  passada: boolean;
+  pode_cancelar: boolean;
+}

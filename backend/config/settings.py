@@ -285,6 +285,17 @@ AI_REQUEST_TIMEOUT = int(os.environ.get("AI_REQUEST_TIMEOUT", "60"))
 
 
 # ---------------------------------------------------------------------------
+# Google Agenda (mentoria) — opcional
+# ---------------------------------------------------------------------------
+# OAuth da conta Google da plataforma. Sem essas variáveis, o convite no
+# Calendar é desligado e o agendamento segue funcionando normalmente.
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN", "")
+GOOGLE_CALENDAR_ID = os.environ.get("GOOGLE_CALENDAR_ID", "primary")
+
+
+# ---------------------------------------------------------------------------
 # E-mail transacional (mesmo SMTP configurado no Supabase)
 # ---------------------------------------------------------------------------
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")

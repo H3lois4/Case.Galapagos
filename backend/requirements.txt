@@ -10,3 +10,5 @@ cryptography==44.0.0
 requests==2.32.3
 boto3==1.35.90
 google-genai==1.12.1
+google-api-python-client==2.161.0
+google-auth==2.38.0
