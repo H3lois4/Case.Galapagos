@@ -28,6 +28,14 @@ import type { MensagemIA } from "@/lib/types";
 interface Props {
   agente: string;
   titulo?: string;
+  /** Conversa já existente (ex.: entrevista criada no setup). */
+  conversaIdInicial?: number | null;
+  /** Idioma da voz (ditado e leitura). Padrão pt-BR. */
+  vozLang?: string;
+  /** Esconde o botão "Nova conversa" (ex.: na entrevista). */
+  ocultarNovaConversa?: boolean;
+  /** Primeira mensagem enviada automaticamente ao montar (ex.: "começar"). */
+  mensagemInicial?: string;
 }
 
 // Mensagem local: id pode ser temporário (negativo) enquanto faz streaming.
@@ -35,9 +43,16 @@ interface MsgLocal extends Omit<MensagemIA, "ordem" | "criado_em"> {
   streaming?: boolean;
 }
 
-export function ChatIA({ agente, titulo }: Props) {
+export function ChatIA({
+  agente,
+  titulo,
+  conversaIdInicial = null,
+  vozLang = "pt-BR",
+  ocultarNovaConversa = false,
+  mensagemInicial,
+}: Props) {
   const [mensagens, setMensagens] = useState<MsgLocal[]>([]);
-  const [conversaId, setConversaId] = useState<number | null>(null);
+  const [conversaId, setConversaId] = useState<number | null>(conversaIdInicial);
   const [rascunho, setRascunho] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [gravando, setGravando] = useState(false);
@@ -61,7 +76,9 @@ export function ChatIA({ agente, titulo }: Props) {
   const enviar = useCallback(
     async (texto: string) => {
       const conteudo = texto.trim();
-      if (!conteudo || enviando) return;
+      const kickoff = conteudo === "";
+      if (enviando) return;
+      if (!conteudo && !kickoff) return;
       setErro(null);
       setRascunho("");
 
@@ -69,7 +86,10 @@ export function ChatIA({ agente, titulo }: Props) {
       const idIa = idUser - 1;
       setMensagens((m) => [
         ...m,
-        { id: idUser, papel: "user", conteudo, util: null },
+        // No kickoff não mostramos bolha da usuária (o contexto já foi semeado).
+        ...(kickoff
+          ? []
+          : [{ id: idUser, papel: "user" as const, conteudo, util: null }]),
         { id: idIa, papel: "assistant", conteudo: "", util: null, streaming: true },
       ]);
       setEnviando(true);
@@ -92,7 +112,7 @@ export function ChatIA({ agente, titulo }: Props) {
               msg.id === idIa ? { ...msg, id: done.message_id, streaming: false } : msg,
             ),
           );
-          if (modoVozRef.current && temVozSaida) falar(textoIa);
+          if (modoVozRef.current && temVozSaida) falar(textoIa, { lang: vozLang });
         },
         onError: (detail) => {
           setErro(detail);
@@ -102,8 +122,23 @@ export function ChatIA({ agente, titulo }: Props) {
 
       setEnviando(false);
     },
-    [agente, conversaId, enviando, temVozSaida],
+    [agente, conversaId, enviando, temVozSaida, vozLang],
   );
+
+  // Ao montar numa conversa já existente (ex.: entrevista com contexto
+  // semeado no backend), dispara um "kickoff" para gerar a 1ª resposta da IA
+  // sem adicionar uma nova mensagem da usuária.
+  const jaIniciou = useRef(false);
+  useEffect(() => {
+    if (jaIniciou.current) return;
+    if (mensagemInicial) {
+      jaIniciou.current = true;
+      enviar(mensagemInicial);
+    } else if (conversaIdInicial) {
+      jaIniciou.current = true;
+      enviar(""); // kickoff
+    }
+  }, [mensagemInicial, conversaIdInicial, enviar]);
 
   function alternarGravacao() {
     if (gravando) {
@@ -112,6 +147,7 @@ export function ChatIA({ agente, titulo }: Props) {
     }
     setErro(null);
     const rec = reconhecer({
+      lang: vozLang,
       onResultado: (texto, final) => {
         setRascunho(texto);
         if (final) {
@@ -156,12 +192,14 @@ export function ChatIA({ agente, titulo }: Props) {
           <Sparkles className="h-5 w-5 text-azul-elas" strokeWidth={1.75} />
           {titulo ?? "Assistente"}
         </h1>
-        <button
-          onClick={novaConversa}
-          className="inline-flex items-center gap-1.5 rounded-pill border border-borda px-3 py-1.5 text-[13px] font-semibold text-tinta-suave hover:border-azul-elas hover:text-tinta"
-        >
-          <Plus className="h-4 w-4" /> Nova conversa
-        </button>
+        {!ocultarNovaConversa && (
+          <button
+            onClick={novaConversa}
+            className="inline-flex items-center gap-1.5 rounded-pill border border-borda px-3 py-1.5 text-[13px] font-semibold text-tinta-suave hover:border-azul-elas hover:text-tinta"
+          >
+            <Plus className="h-4 w-4" /> Nova conversa
+          </button>
+        )}
       </div>
 
       {/* Mensagens */}
@@ -191,7 +229,7 @@ export function ChatIA({ agente, titulo }: Props) {
                 <div className="mt-1 flex items-center gap-2 text-tinta-suave">
                   {temVozSaida && (
                     <button
-                      onClick={() => falar(msg.conteudo)}
+                      onClick={() => falar(msg.conteudo, { lang: vozLang })}
                       aria-label="Ouvir resposta"
                       className="rounded-pill p-1 hover:bg-fundo-alt hover:text-tinta"
                     >

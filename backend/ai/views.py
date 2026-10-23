@@ -138,7 +138,13 @@ class ChatView(APIView):
             )
 
         texto = dados["mensagem"].strip()
-        if not texto:
+        conversa_id = dados.get("conversa_id")
+
+        # "Kickoff": mensagem vazia numa conversa existente cuja última mensagem
+        # é da usuária (ex.: entrevista com o contexto já semeado). Nesse caso,
+        # só geramos a resposta da IA a partir do histórico, sem nova mensagem.
+        kickoff = not texto and bool(conversa_id)
+        if not texto and not kickoff:
             return Response(
                 {"detail": "Mensagem vazia."}, status=status.HTTP_400_BAD_REQUEST
             )
@@ -158,7 +164,6 @@ class ChatView(APIView):
             return resp
 
         # Conversa: existente (dono) ou nova.
-        conversa_id = dados.get("conversa_id")
         if conversa_id:
             conversa = get_object_or_404(
                 Conversation, pk=conversa_id, profile=profile, agente=agente.chave
@@ -168,16 +173,25 @@ class ChatView(APIView):
                 profile=profile, agente=agente.chave
             )
 
-        # Salva a mensagem da usuária.
-        msg_user = Message.objects.create(
-            conversation=conversa,
-            papel=Message.PAPEL_USER,
-            conteudo=texto,
-            ordem=conversa.proxima_ordem,
-        )
-        if not conversa.titulo:
-            conversa.titulo = titulo_a_partir(texto)
-            conversa.save(update_fields=["titulo", "atualizado_em"])
+        if kickoff:
+            ultima = conversa.mensagens.order_by("-ordem").first()
+            if ultima is None or ultima.papel != Message.PAPEL_USER:
+                return Response(
+                    {"detail": "Nada a responder."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            msg_user = ultima
+        else:
+            # Salva a mensagem da usuária.
+            msg_user = Message.objects.create(
+                conversation=conversa,
+                papel=Message.PAPEL_USER,
+                conteudo=texto,
+                ordem=conversa.proxima_ordem,
+            )
+            if not conversa.titulo:
+                conversa.titulo = titulo_a_partir(texto)
+                conversa.save(update_fields=["titulo", "atualizado_em"])
 
         system = construir_system(agente, conversa)
         mensagens = historico_para_modelo(conversa)

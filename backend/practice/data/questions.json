@@ -1,0 +1,141 @@
+[
+  {
+    "chave": "mf-001",
+    "tema": "mercado-financeiro",
+    "enunciado": "O que é o CDI?",
+    "alternativas": [
+      "Um imposto cobrado sobre investimentos",
+      "A taxa média dos empréstimos de curtíssimo prazo entre bancos",
+      "O índice oficial da inflação no Brasil",
+      "Um tipo de conta corrente remunerada"
+    ],
+    "correta": 1,
+    "explicacao": "O CDI (Certificado de Depósito Interbancário) reflete a taxa média dos empréstimos de um dia entre bancos e serve de referência para muitos investimentos de renda fixa."
+  },
+  {
+    "chave": "mf-002",
+    "tema": "mercado-financeiro",
+    "enunciado": "Renda fixa e renda variável diferem principalmente porque:",
+    "alternativas": [
+      "Renda fixa nunca tem risco e renda variável sempre perde dinheiro",
+      "Na renda fixa as regras de remuneração são conhecidas na aplicação; na variável, o retorno oscila com o mercado",
+      "Renda variável é isenta de imposto e renda fixa não",
+      "Não há diferença prática entre elas"
+    ],
+    "correta": 1,
+    "explicacao": "Na renda fixa, a forma de cálculo do rendimento é definida na aplicação (ainda que haja riscos). Na renda variável, o retorno depende da oscilação dos ativos no mercado."
+  },
+  {
+    "chave": "mf-003",
+    "tema": "mercado-financeiro",
+    "enunciado": "O que é a taxa Selic?",
+    "alternativas": [
+      "A taxa de câmbio do dólar",
+      "A taxa básica de juros da economia brasileira",
+      "A taxa de administração dos fundos",
+      "O rendimento garantido da poupança"
+    ],
+    "correta": 1,
+    "explicacao": "A Selic é a taxa básica de juros da economia brasileira, definida pelo Copom, e influencia as demais taxas do mercado."
+  },
+  {
+    "chave": "cert-001",
+    "tema": "certificacoes",
+    "enunciado": "A certificação CPA-20 é voltada principalmente para:",
+    "alternativas": [
+      "Profissionais que atuam com planejamento sucessório apenas",
+      "Profissionais que atendem clientes em agências e assessoram investimentos",
+      "Auditores independentes",
+      "Desenvolvedores de sistemas bancários"
+    ],
+    "correta": 1,
+    "explicacao": "A CPA-20 (ANBIMA) certifica profissionais que atendem clientes e atuam na distribuição de produtos de investimento, inclusive no varejo de alta renda."
+  },
+  {
+    "chave": "cert-002",
+    "tema": "certificacoes",
+    "enunciado": "A certificação CFA é conhecida por:",
+    "alternativas": [
+      "Ser uma certificação nacional de curtíssima duração",
+      "Ser uma referência internacional em análise de investimentos, com três níveis",
+      "Habilitar apenas para abrir conta em corretora",
+      "Substituir a graduação em qualquer área"
+    ],
+    "correta": 1,
+    "explicacao": "A CFA (Chartered Financial Analyst) é uma certificação internacional de referência em investimentos, dividida em três níveis e reconhecida globalmente."
+  },
+  {
+    "chave": "matfin-001",
+    "tema": "matematica-financeira",
+    "enunciado": "Um capital de R$ 1.000 a juros simples de 2% ao mês rende, em 3 meses, juros de:",
+    "alternativas": ["R$ 20", "R$ 60", "R$ 61,20", "R$ 600"],
+    "correta": 1,
+    "explicacao": "Juros simples: J = C × i × t = 1000 × 0,02 × 3 = R$ 60."
+  },
+  {
+    "chave": "matfin-002",
+    "tema": "matematica-financeira",
+    "enunciado": "A principal diferença entre juros simples e juros compostos é que, nos compostos:",
+    "alternativas": [
+      "Os juros incidem sempre só sobre o capital inicial",
+      "Os juros de cada período passam a render juros nos períodos seguintes",
+      "Não há incidência de juros",
+      "A taxa é sempre menor"
+    ],
+    "correta": 1,
+    "explicacao": "Nos juros compostos, os juros são incorporados ao capital e passam a render juros (juros sobre juros), ao contrário dos simples."
+  },
+  {
+    "chave": "excel-001",
+    "tema": "excel",
+    "enunciado": "Qual função soma um intervalo apenas quando uma condição é satisfeita?",
+    "alternativas": ["SOMA", "SOMASE", "MÉDIA", "PROCV"],
+    "correta": 1,
+    "explicacao": "SOMASE (SUMIF) soma os valores de um intervalo que atendem a um critério definido."
+  },
+  {
+    "chave": "excel-002",
+    "tema": "excel",
+    "enunciado": "A função PROCV (VLOOKUP) serve para:",
+    "alternativas": [
+      "Contar células vazias",
+      "Procurar um valor na primeira coluna de uma tabela e retornar um valor na mesma linha",
+      "Formatar células condicionalmente",
+      "Criar um gráfico automaticamente"
+    ],
+    "correta": 1,
+    "explicacao": "O PROCV busca um valor na primeira coluna de uma tabela e retorna o valor correspondente de outra coluna na mesma linha."
+  },
+  {
+    "chave": "py-001",
+    "tema": "programacao-python",
+    "enunciado": "Qual estrutura de dados do Python é definida com chaves e pares chave-valor?",
+    "alternativas": ["list", "tuple", "dict", "set"],
+    "correta": 2,
+    "explicacao": "O dicionário (dict) armazena pares chave-valor, escrito com chaves: {\"a\": 1}."
+  },
+  {
+    "chave": "py-002",
+    "tema": "programacao-python",
+    "enunciado": "O que o código `len([10, 20, 30])` retorna?",
+    "alternativas": ["10", "3", "60", "Um erro"],
+    "correta": 1,
+    "explicacao": "len() devolve a quantidade de itens de uma sequência; a lista tem 3 elementos, então retorna 3."
+  },
+  {
+    "chave": "en-001",
+    "tema": "ingles",
+    "enunciado": "Choose the correct option: \"She has worked in finance ___ 2015.\"",
+    "alternativas": ["since", "for", "ago", "during"],
+    "correta": 0,
+    "explicacao": "Com um ponto de início específico no tempo (2015), usamos \"since\". \"For\" seria usado com duração (for 8 years)."
+  },
+  {
+    "chave": "en-002",
+    "tema": "ingles",
+    "enunciado": "In a job interview, \"strengths\" means:",
+    "alternativas": ["pontos fracos", "pontos fortes", "salário", "horário"],
+    "correta": 1,
+    "explicacao": "\"Strengths\" são os pontos fortes; \"weaknesses\" seriam os pontos fracos."
+  }
+]

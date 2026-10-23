@@ -11,7 +11,13 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
 import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
 import { apiAuth, apiAuthJson } from "@/lib/api";
-import type { Me, Mentoria, PlanoCarreira } from "@/lib/types";
+import type {
+  Me,
+  Mentoria,
+  PlanoCarreira,
+  SimuladoHistorico,
+  EntrevistaHistorico,
+} from "@/lib/types";
 import { LogOut, Trash2, Building2, Loader2 } from "lucide-react";
 
 export default function PerfilPage() {
@@ -20,6 +26,8 @@ export default function PerfilPage() {
   const [me, setMe] = useState<Me | null>(null);
   const [plano, setPlano] = useState<PlanoCarreira | null>(null);
   const [mentorias, setMentorias] = useState<Mentoria[]>([]);
+  const [simulados, setSimulados] = useState<SimuladoHistorico[]>([]);
+  const [entrevistas, setEntrevistas] = useState<EntrevistaHistorico[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
@@ -43,7 +51,25 @@ export default function PerfilPage() {
     apiAuthJson<Mentoria[]>("/api/mentoria/minhas/")
       .then(setMentorias)
       .catch(() => setMentorias([]));
+    // Histórico de prática
+    apiAuthJson<SimuladoHistorico[]>("/api/pratica/simulados/historico/")
+      .then(setSimulados)
+      .catch(() => setSimulados([]));
+    apiAuthJson<EntrevistaHistorico[]>("/api/pratica/entrevistas/historico/")
+      .then(setEntrevistas)
+      .catch(() => setEntrevistas([]));
   }, []);
+
+  function dataCurta(iso: string): string {
+    try {
+      return new Date(iso).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "short",
+      });
+    } catch {
+      return "";
+    }
+  }
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -216,9 +242,48 @@ export default function PerfilPage() {
             <MinhasMentorias mentorias={mentorias} onMudou={setMentorias} compacto />
           </div>
         </div>
-        <ul className="mt-4 space-y-1 text-[14px] text-tinta-suave">
-          <li>Histórico de entrevistas e simulados — em breve (etapa Prática)</li>
-        </ul>
+        <div className="mt-4">
+          <h3 className="text-[14px] font-semibold text-tinta">Simulados</h3>
+          {simulados.length === 0 ? (
+            <p className="mt-1 text-[13px] text-tinta-suave">
+              Nenhum simulado feito.{" "}
+              <Link href="/pratica" className="font-semibold text-azul-elas hover:underline">
+                Fazer um
+              </Link>
+              .
+            </p>
+          ) : (
+            <ul className="mt-2 space-y-1 text-[13px]">
+              {simulados.slice(0, 5).map((s) => (
+                <li key={s.id} className="flex justify-between gap-3 text-tinta">
+                  <span className="truncate">{s.tema}</span>
+                  <span className="shrink-0 text-tinta-suave">
+                    {s.nota}/{s.total} · {dataCurta(s.criado_em)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="mt-4">
+          <h3 className="text-[14px] font-semibold text-tinta">Entrevistas</h3>
+          {entrevistas.length === 0 ? (
+            <p className="mt-1 text-[13px] text-tinta-suave">Nenhuma entrevista feita.</p>
+          ) : (
+            <ul className="mt-2 space-y-1 text-[13px]">
+              {entrevistas.slice(0, 5).map((e) => (
+                <li key={e.id} className="flex justify-between gap-3 text-tinta">
+                  <span className="truncate">{e.vaga}</span>
+                  <span className="shrink-0 text-tinta-suave">
+                    {e.nota_geral != null ? `${e.nota_geral}/10 · ` : ""}
+                    {dataCurta(e.criado_em)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </Card>
 
       <Card>

@@ -203,3 +203,91 @@ export interface Mentoria {
   passada: boolean;
   pode_cancelar: boolean;
 }
+
+// ---------------------------------------------------------------------------
+// Prática (etapa 06-pratica)
+// ---------------------------------------------------------------------------
+
+export interface TemaSimulado {
+  slug: string;
+  nome: string;
+  questoes: number;
+}
+
+export interface QuestaoPublica {
+  id: number;
+  enunciado: string;
+  alternativas: string[];
+}
+
+export interface SimuladoIniciado {
+  attempt_id: number;
+  tema: string;
+  tema_nome: string;
+  questoes: QuestaoPublica[];
+}
+
+export interface RevisaoQuestao {
+  id: number;
+  enunciado: string;
+  alternativas: string[];
+  escolhida: number | null;
+  correta: number;
+  acertou: boolean;
+  explicacao: string;
+}
+
+export interface ResultadoSimulado {
+  attempt_id: number;
+  tema: string;
+  nota: number;
+  total: number;
+  revisao: RevisaoQuestao[];
+}
+
+export interface SimuladoHistorico {
+  id: number;
+  tema: string;
+  nota: number;
+  total: number;
+  finalizado: boolean;
+  criado_em: string;
+}
+
+export interface RelatorioPorPergunta {
+  pergunta: string;
+  resumo_resposta: string;
+  avaliacao: string;
+  sugestao: string;
+}
+
+export interface RelatorioEntrevista {
+  nota_geral: number;
+  pontos_fortes: string[];
+  melhorias: string[];
+  por_pergunta: RelatorioPorPergunta[];
+  proximos_passos: string[];
+}
+
+export interface Entrevista {
+  id: number;
+  vaga: string;
+  papel_entrevistador: string;
+  tipo: string;
+  nivel: string;
+  idioma: "pt" | "en";
+  descricao: string;
+  conversa_id: number | null;
+  relatorio: RelatorioEntrevista | null;
+  nota_geral: number | null;
+  criado_em: string;
+  finalizado_em: string | null;
+}
+
+export interface EntrevistaHistorico {
+  id: number;
+  vaga: string;
+  nota_geral: number | null;
+  criado_em: string;
+  finalizado_em: string | null;
+}

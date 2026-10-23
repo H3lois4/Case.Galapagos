@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base**, **04-carreira** e **05-mentoria** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, a fundação de IA, a tela de Carreira com áreas/PDF/plano, e a Mentoria com IA mentora e agenda com concorrência segura + Google Agenda). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
+> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas**, **03-ia-base**, **04-carreira**, **05-mentoria** e **06-pratica** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo no R2, a fundação de IA, a Carreira com áreas/PDF/plano, a Mentoria com agenda segura + Google Agenda, e a Prática com simulados e entrevista com IA). Faltam a Rede (07) e o seed/polimento final (08) — ver `.kiro/specs/`.
 
 ---
 
@@ -257,6 +257,20 @@ A integração usa OAuth da **conta Google da plataforma** (um refresh token em 
 
 > **Sem essas variáveis, a mentoria funciona normalmente** — apenas não cria o evento/convite no Calendar (degradação graciosa). A IA mentora depende da `GEMINI_API_KEY` (ver seção de IA).
 
+## Prática (simulados e entrevista com IA)
+
+A tela **Prática** tem duas ferramentas:
+
+- **Simulados de múltipla escolha** (sem IA): questões curadas por tema (Mercado financeiro, Certificações/CPA, Matemática financeira, Excel, Programação/Python, Inglês), 10 por rodada, cronômetro opcional, nota e explicação por resposta, com histórico. O **gabarito é corrigido no servidor** e nunca é enviado ao cliente antes do envio das respostas. Para popular/editar o banco:
+  ```bash
+  cd backend
+  python manage.py seed_questions   # idempotente (upsert por chave)
+  ```
+  As questões ficam em `backend/practice/data/questions.json` (expansível) — cada tema já vem com exemplos funcionais. Também dá para editar no Django Admin.
+- **Entrevista com IA**: a usuária define vaga, tipo, nível e idioma; a IA conduz 6–10 perguntas (uma por vez, sem feedback durante) e, ao encerrar, gera um **relatório estruturado** exportável em PDF. Usa o agente `entrevistadora` (prompt em `backend/ai/prompts/entrevistadora.md`). Depende da `GEMINI_API_KEY` (ver seção de IA); os simulados funcionam sem chave.
+
+O histórico de simulados e entrevistas aparece no **Perfil**, em "Minha jornada".
+
 ## Seed de demonstração
 
 O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui. (As áreas de carreira já têm o seed próprio `seed_areas`, acima.)
@@ -292,6 +306,6 @@ Case.Galapagos/
 4. `03-ia-base` — provedores de LLM, streaming, chat com voz. ✅
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira. ✅
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda. ✅
-7. `06-pratica` — entrevista com IA e simulados.
+7. `06-pratica` — entrevista com IA e simulados. ✅
 8. `07-rede` — posts, notícias, carrossel, IA de notícias.
 9. `08-seed-e-polimento` — `seed_demo` e revisão final.

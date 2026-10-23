@@ -43,7 +43,9 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
 
 class ChatInputSerializer(serializers.Serializer):
     agente = serializers.CharField(max_length=40)
-    mensagem = serializers.CharField()
+    # Pode vir vazio num "kickoff" (gerar a 1ª resposta de uma conversa já
+    # semeada, ex.: entrevista). A view valida o caso.
+    mensagem = serializers.CharField(allow_blank=True, required=False, default="")
     conversa_id = serializers.IntegerField(required=False)
 
 
