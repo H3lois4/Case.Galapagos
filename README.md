@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00** a **07** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo no R2, a fundação de IA, a Carreira com áreas/PDF/plano, a Mentoria com agenda segura + Google Agenda, a Prática com simulados e entrevista com IA, e a Rede com feed, interações sociais e IA de notícias). Falta o seed/polimento final (08) — ver `.kiro/specs/`.
+> Status: **todas as etapas (00–08) concluídas.** App completo ponta a ponta: autenticação Supabase + perfis, aulas em vídeo no R2, a fundação de IA, a Carreira com áreas/PDF/plano, a Mentoria com agenda segura + Google Agenda, a Prática com simulados e entrevista com IA, a Rede com feed/interações/IA de notícias, e o `seed_demo` para popular a demonstração. Os recursos externos (R2, Gemini, Google Agenda, cron de notícias) degradam com elegância quando as credenciais não estão configuradas.
 
 ---
 
@@ -297,7 +297,17 @@ Uma IA publica resumos de notícias do mercado, **reescritos com palavras própr
 
 ## Seed de demonstração
 
-O comando `python manage.py seed_demo` será implementado na etapa **08-seed-e-polimento**. Quando existir, a documentação de uso entra aqui. (As áreas de carreira já têm o seed próprio `seed_areas`, acima.)
+O comando `seed_demo` popula o banco com dados coerentes para a banca testar todas as telas (Aulas, Carreira, Mentoria, Prática, Rede e Perfis) **sem depender de serviços externos** (R2, Gemini, Google) — usa URLs placeholder e conteúdo fixo.
+
+```bash
+cd backend
+python manage.py seed_demo            # cria/atualiza (idempotente)
+python manage.py seed_demo --limpar   # remove só os dados de demonstração
+```
+
+O que ele cria: 2 empresas aprovadas, perfis de exemplo (pessoal e de empresa), aulas (empresa e "Básico com IA" com um vídeo público de teste), as áreas de carreira (`seed_areas`) e as questões dos simulados (`seed_questions`), horários de mentoria futuros, posts/vagas/notícias na Rede e um plano de carreira de exemplo.
+
+Os dados de demo são marcados (empresas com slug `demo-*`, perfis com `supabase_sub` `demo-*`), então `--limpar` remove apenas eles, preservando dados reais de usuárias. Os perfis de demo existem só no Django (não criam login no Supabase) — servem para preencher as telas.
 
 ---
 
@@ -332,4 +342,4 @@ Case.Galapagos/
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda. ✅
 7. `06-pratica` — entrevista com IA e simulados. ✅
 8. `07-rede` — posts, notícias, carrossel, IA de notícias. ✅
-9. `08-seed-e-polimento` — `seed_demo` e revisão final.
+9. `08-seed-e-polimento` — `seed_demo` e revisão final. ✅
