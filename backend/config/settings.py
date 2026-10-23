@@ -268,6 +268,23 @@ UPLOAD_VIDEO_MAX_SEG = int(os.environ.get("UPLOAD_VIDEO_MAX_SEG", 600))  # 10 mi
 
 
 # ---------------------------------------------------------------------------
+# IA (LLM trocável por provedor) — etapa 03-ia-base
+# ---------------------------------------------------------------------------
+# Provedor e modelo são trocáveis sem mudar código. Padrão: Gemini Flash.
+LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini").lower()
+LLM_MODEL = os.environ.get("LLM_MODEL", "gemini-2.5-flash")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+
+# Limite de mensagens por usuária por hora (protege a cota gratuita).
+AI_RATE_LIMIT_PER_HOUR = int(os.environ.get("AI_RATE_LIMIT_PER_HOUR", "30"))
+# Nº de mensagens recentes do histórico enviadas ao modelo.
+AI_MAX_HISTORY = int(os.environ.get("AI_MAX_HISTORY", "20"))
+AI_REQUEST_TIMEOUT = int(os.environ.get("AI_REQUEST_TIMEOUT", "60"))
+
+
+# ---------------------------------------------------------------------------
 # E-mail transacional (mesmo SMTP configurado no Supabase)
 # ---------------------------------------------------------------------------
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")

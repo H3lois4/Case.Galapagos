@@ -89,3 +89,36 @@ export interface UploadUrlResp {
   content_type: string;
   metodo: "PUT";
 }
+
+// ---------------------------------------------------------------------------
+// IA (etapa 03-ia-base)
+// ---------------------------------------------------------------------------
+
+export type PapelMensagem = "user" | "assistant";
+
+export interface MensagemIA {
+  id: number;
+  papel: PapelMensagem;
+  conteudo: string;
+  ordem: number;
+  criado_em: string;
+  util: boolean | null;
+}
+
+export interface ConversaIA {
+  id: number;
+  agente: string;
+  titulo: string;
+  resumo: string;
+  criado_em: string;
+  atualizado_em: string;
+}
+
+export interface ConversaIADetalhe extends ConversaIA {
+  mensagens: MensagemIA[];
+}
+
+export interface AgenteIA {
+  chave: string;
+  nome: string;
+}

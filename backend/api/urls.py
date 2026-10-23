@@ -13,4 +13,5 @@ urlpatterns = [
     path("health/", views.health, name="health"),
     path("", include("accounts.urls")),
     path("", include("lessons.urls")),
+    path("", include("ai.urls")),
 ]

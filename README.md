@@ -9,7 +9,7 @@ Monorepo com dois projetos que fazem deploy independente na Vercel, a partir do 
 | `frontend/` | `por-elas-web` | Next.js (App Router) + TypeScript + Tailwind + PWA |
 | `backend/` | `por-elas-api` | Django + Django REST Framework (serverless) |
 
-> Status: etapas **00-fundacao**, **01-auth-perfis** e **02-aulas** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, e aulas em vídeo com upload direto para o R2). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
+> Status: etapas **00-fundacao**, **01-auth-perfis**, **02-aulas** e **03-ia-base** concluídas (esqueleto do app, design system, navegação, PWA, `/api/health/`, autenticação Supabase + perfis, aulas em vídeo com upload direto para o R2, e a fundação de IA — LLM trocável com streaming e chat por voz). As próximas funcionalidades de produto chegam nas etapas seguintes (ver `.kiro/specs/`).
 
 ---
 
@@ -106,6 +106,12 @@ App em `http://localhost:3000` (redireciona para `/aulas`). A tela **Perfil** mo
 | `R2_PUBLIC_BASE_URL` | URL pública de leitura do bucket (ex.: `https://pub-xxxx.r2.dev`). |
 | `UPLOAD_VIDEO_MAX_BYTES` / `UPLOAD_IMG_MAX_BYTES` | Limites de tamanho (padrão 200 MB / 5 MB). |
 | `UPLOAD_URL_TTL` / `UPLOAD_VIDEO_MAX_SEG` | Expiração da URL pré-assinada e duração máxima do vídeo. |
+| `LLM_PROVIDER` | Provedor de IA: `gemini` (padrão), `openai` ou `anthropic`. |
+| `LLM_MODEL` | Modelo usado (padrão `gemini-2.5-flash`). |
+| `GEMINI_API_KEY` | Chave do Gemini (Google AI Studio). Obrigatória no provedor padrão. |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | Chaves dos provedores alternativos (opcionais). |
+| `AI_RATE_LIMIT_PER_HOUR` | Limite de mensagens por usuária por hora (padrão 30). |
+| `AI_MAX_HISTORY` | Nº de mensagens recentes enviadas ao modelo (padrão 20). |
 
 ### `frontend/.env.example`
 
@@ -141,6 +147,29 @@ Passo a passo completo (ativar R2, criar bucket, token S3, bucket público e COR
 Limites padrão: vídeo até **200 MB** e **10 min** (`video/mp4` ou `video/webm`); capa até **5 MB** (JPG/PNG/WebP). A URL pré-assinada expira em **10 min** e só é gerada para usuárias de **empresa aprovada**.
 
 > Sem as variáveis `R2_*`, a tela de aulas continua funcionando (listagem e player de aulas já cadastradas); apenas o upload responde `503` até configurar o R2.
+
+## IA (LLM trocável)
+
+As IAs do app (assistente, e nas próximas etapas carreira, mentoria e prática) usam um **LLM pronto** — não treinamos modelo. O padrão é o **Gemini Flash** (plano gratuito). O provedor e o modelo são trocáveis por variável de ambiente, sem mexer no código:
+
+```
+LLM_PROVIDER=gemini            # gemini | openai | anthropic
+LLM_MODEL=gemini-2.5-flash
+GEMINI_API_KEY=...             # gere em https://aistudio.google.com/apikey
+```
+
+Como "treinar" a IA sem código:
+- **Prompt de sistema** de cada agente em `backend/ai/prompts/<agente>.md`.
+- **Base de conhecimento** em `backend/ai/knowledge/<agente>/*.md` (injetada no prompt).
+- Editar esses `.md` muda o comportamento do agente. Regras globais (pt-BR, tom acolhedor, não recomendar investimento, não inventar fatos) valem para todos.
+
+Outros pontos:
+- As respostas chegam em **streaming (SSE)** pelo endpoint `POST /api/ai/chat/`.
+- O frontend tem um **chat único com voz** (Web Speech API): ditar, ouvir a resposta e modo conversa por voz. Teste em **Perfil → Diagnóstico → "Testar assistente de IA"** (`/assistente`).
+- **Limite de uso:** `AI_RATE_LIMIT_PER_HOUR` mensagens por usuária por hora (padrão 30), para proteger a cota gratuita.
+- Sem `GEMINI_API_KEY`, o chat responde erro claro; o resto do app segue funcionando.
+
+> Crescimento: a busca semântica (RAG com pgvector no Supabase) fica preparada para quando a base de conhecimento crescer; no MVP, o conhecimento é injetado direto no prompt.
 
 ---
 
@@ -224,7 +253,7 @@ Case.Galapagos/
 1. `00-fundacao` — base do monorepo, design system, navegação, PWA, health, deploy. ✅
 2. `01-auth-perfis` — Supabase Auth, perfis, username, verificação de empresa. ✅
 3. `02-aulas` — aulas em vídeo, upload direto para o R2. ✅
-4. `03-ia-base` — provedores de LLM, streaming, chat com voz.
+4. `03-ia-base` — provedores de LLM, streaming, chat com voz. ✅
 5. `04-carreira` — áreas do mercado, PDF, IA de carreira.
 6. `05-mentoria` — agenda com concorrência segura, Google Agenda.
 7. `06-pratica` — entrevista com IA e simulados.

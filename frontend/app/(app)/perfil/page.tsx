@@ -194,6 +194,12 @@ export default function PerfilPage() {
         <div className="mt-3">
           <ApiStatusBadge />
         </div>
+        <Link
+          href="/assistente"
+          className="mt-3 inline-block text-[13px] font-semibold text-azul-elas hover:underline"
+        >
+          Testar assistente de IA
+        </Link>
       </Card>
 
       {/* Ações da conta */}
