@@ -272,7 +272,7 @@ UPLOAD_VIDEO_MAX_SEG = int(os.environ.get("UPLOAD_VIDEO_MAX_SEG", 600))  # 10 mi
 # ---------------------------------------------------------------------------
 # Provedor e modelo são trocáveis sem mudar código. Padrão: Gemini Flash.
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini").lower()
-LLM_MODEL = os.environ.get("LLM_MODEL", "gemini-2.5-flash")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gemini-3.5-flash")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
