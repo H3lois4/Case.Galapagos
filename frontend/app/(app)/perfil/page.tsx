@@ -11,6 +11,8 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
 import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
 import { apiAuth, apiAuthJson } from "@/lib/api";
+import { enviarFotoPerfil, validarArquivo } from "@/lib/upload";
+import { invalidarAvatarCache } from "@/components/nav/AvatarUsuaria";
 import type {
   Me,
   Mentoria,
@@ -18,7 +20,7 @@ import type {
   SimuladoHistorico,
   EntrevistaHistorico,
 } from "@/lib/types";
-import { LogOut, Trash2, Building2, Loader2 } from "lucide-react";
+import { LogOut, Trash2, Building2, Loader2, Camera } from "lucide-react";
 
 export default function PerfilPage() {
   const router = useRouter();
@@ -31,6 +33,8 @@ export default function PerfilPage() {
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
+  const [fotoProgresso, setFotoProgresso] = useState<number | null>(null);
+  const [fotoErro, setFotoErro] = useState<string | null>(null);
 
   useEffect(() => {
     apiAuthJson<Me>("/api/me/")
@@ -82,6 +86,33 @@ export default function PerfilPage() {
     if (m) setMe(m);
   }
 
+  async function aoEscolherFoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    e.target.value = ""; // permite reescolher o mesmo arquivo
+    if (!arquivo) return;
+    setFotoErro(null);
+
+    const erro = await validarArquivo(arquivo, "imagem");
+    if (erro) {
+      setFotoErro(erro);
+      return;
+    }
+    try {
+      setFotoProgresso(0);
+      const urlPublica = await enviarFotoPerfil(arquivo, setFotoProgresso);
+      const m = await apiAuthJson<Me>("/api/me/", {
+        method: "PATCH",
+        body: JSON.stringify({ foto: urlPublica }),
+      });
+      setMe(m);
+      invalidarAvatarCache(); // atualiza o avatar do topo
+    } catch {
+      setFotoErro("Não foi possível enviar a foto. Tente novamente.");
+    } finally {
+      setFotoProgresso(null);
+    }
+  }
+
   async function sair() {
     await signOut();
     router.replace("/login");
@@ -105,26 +136,50 @@ export default function PerfilPage() {
   return (
     <div className="space-y-6 py-4">
       <div className="flex items-center gap-4">
-        <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-pill bg-gradient-to-br from-rosa-elas to-azul-elas text-xl font-bold text-white">
-          {me?.foto ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={me.foto} alt="" className="h-full w-full object-cover" />
-          ) : (
-            (me?.nome_exibicao || me?.username || me?.email || "?").charAt(0).toUpperCase()
-          )}
-        </span>
+        <label
+          className="group relative h-16 w-16 shrink-0 cursor-pointer"
+          title="Trocar foto de perfil"
+        >
+          <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-pill bg-gradient-to-br from-rosa-elas to-azul-elas text-xl font-bold text-white">
+            {me?.foto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={me.foto} alt="" className="h-full w-full object-cover" />
+            ) : (
+              (me?.nome_exibicao || me?.username || me?.email || "?").charAt(0).toUpperCase()
+            )}
+          </span>
+          {/* Badge de câmera */}
+          <span className="absolute -bottom-0.5 -right-0.5 flex h-6 w-6 items-center justify-center rounded-pill border-2 border-fundo bg-azul-elas text-white">
+            {fotoProgresso !== null ? (
+              <span className="text-[9px] font-bold">{fotoProgresso}%</span>
+            ) : (
+              <Camera className="h-3.5 w-3.5" strokeWidth={2} />
+            )}
+          </span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            className="sr-only"
+            onChange={aoEscolherFoto}
+            disabled={fotoProgresso !== null}
+          />
+        </label>
         <div className="min-w-0">
           <h1 className="font-titulo text-[22px] font-bold text-tinta">
             {me?.nome_exibicao || me?.username}
           </h1>
           <p className="truncate text-[14px] text-tinta-suave">@{me?.username}</p>
-          {me?.username && (
-            <Link
-              href={`/u/${me.username}`}
-              className="text-[13px] font-semibold text-azul-elas hover:underline"
-            >
-              Ver perfil público
-            </Link>
+          {fotoErro ? (
+            <p className="text-[12px] text-perigo">{fotoErro}</p>
+          ) : (
+            me?.username && (
+              <Link
+                href={`/u/${me.username}`}
+                className="text-[13px] font-semibold text-azul-elas hover:underline"
+              >
+                Ver perfil público
+              </Link>
+            )
           )}
         </div>
       </div>

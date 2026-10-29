@@ -119,3 +119,25 @@ export async function enviarParaR2(
   await putComProgresso(presign.url, arquivo, presign.content_type, onProgresso);
   return presign.key;
 }
+
+/**
+ * Envia a foto de perfil ao R2 (endpoint próprio, liberado a qualquer usuária)
+ * e devolve a URL pública para salvar no perfil via PATCH /api/me/.
+ */
+export async function enviarFotoPerfil(
+  arquivo: File,
+  onProgresso: (pct: number) => void,
+): Promise<string> {
+  const presign = await apiAuthJson<UploadUrlResp & { url_publica: string }>(
+    "/api/me/foto-upload-url/",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        content_type: arquivo.type,
+        tamanho: arquivo.size,
+      }),
+    },
+  );
+  await putComProgresso(presign.url, arquivo, presign.content_type, onProgresso);
+  return presign.url_publica;
+}

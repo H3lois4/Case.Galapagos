@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { Logo } from "@/components/brand/LogoMark";
+import { AvatarUsuaria } from "@/components/nav/AvatarUsuaria";
 
 /**
  * Topo do app. No celular mostra a logo + avatar.
@@ -12,13 +12,7 @@ export function TopBar() {
         <Logo />
       </div>
       <div className="hidden md:block" />
-      <Link
-        href="/perfil"
-        aria-label="Abrir perfil"
-        className="flex h-10 w-10 items-center justify-center rounded-pill bg-gradient-to-br from-rosa-elas to-azul-elas text-sm font-bold text-white"
-      >
-        H
-      </Link>
+      <AvatarUsuaria />
     </header>
   );
 }

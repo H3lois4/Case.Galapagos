@@ -17,6 +17,7 @@ urlpatterns = [
     ),
     path("me/aceite-termos/", views.AceiteTermosView.as_view(), name="me-termos"),
     path("me/tipo-conta/", views.TipoContaView.as_view(), name="me-tipo-conta"),
+    path("me/foto-upload-url/", views.FotoUploadUrlView.as_view(), name="me-foto-upload-url"),
     # Verificação de empresa
     path("empresa/verificar/", views.EmpresaVerificarView.as_view(), name="empresa-verificar"),
     path("empresa/confirmar/", views.EmpresaConfirmarView.as_view(), name="empresa-confirmar"),

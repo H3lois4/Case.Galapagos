@@ -31,6 +31,47 @@ def _profile(request) -> Profile:
     return request.user.profile
 
 
+class FotoUploadUrlView(APIView):
+    """URL pré-assinada para a usuária enviar a própria foto de perfil ao R2.
+
+    Diferente do upload de aulas, está liberado para qualquer usuária
+    autenticada (não exige empresa). Só aceita imagem.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        from lessons import storage
+
+        if not storage.r2_configurado():
+            return Response(
+                {"code": "r2_indisponivel", "detail": "Armazenamento não configurado."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        content_type = (request.data.get("content_type") or "").strip()
+        tamanho = request.data.get("tamanho") or 0
+        try:
+            ext = storage.validar_upload("imagem", content_type, int(tamanho))
+        except (storage.UploadInvalido, ValueError, TypeError) as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        profile = _profile(request)
+        # Chave dedicada por usuária: perfil/<sub>/<uuid>.<ext>
+        import uuid
+
+        key = f"perfil/{profile.supabase_sub}/{uuid.uuid4().hex}.{ext}"
+        url = storage.presign_put(key, content_type)
+        return Response(
+            {
+                "url": url,
+                "key": key,
+                "content_type": content_type,
+                "metodo": "PUT",
+                "url_publica": storage.url_publica(key),
+            }
+        )
+
+
 class MeView(APIView):
     """GET / PATCH / DELETE do próprio perfil."""
 
