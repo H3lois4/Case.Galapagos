@@ -1,28 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, X as XIcon, Loader2, Share2, Download } from "lucide-react";
+import { X, Check, X as XIcon, Loader2, Share2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { apiAuthJson } from "@/lib/api";
 import { gerarPdfSimulado } from "@/lib/pdfSimulado";
 import { Button } from "@/components/ui/Button";
 import type { ResultadoSimulado } from "@/lib/types";
-
-/** Verifica se o navegador suporta compartilhar arquivos (celular). */
-function canShareFiles(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const nav = navigator as Navigator & {
-    canShare?: (d: ShareData) => boolean;
-    share?: (d: ShareData) => Promise<void>;
-  };
-  if (!nav.share || !nav.canShare) return false;
-  try {
-    const amostra = new File([new Blob()], "x.pdf", { type: "application/pdf" });
-    return nav.canShare({ files: [amostra] });
-  } catch {
-    return false;
-  }
-}
 
 /**
  * Pop-up que abre o relatório de um simulado já salvo (Minha jornada).
@@ -64,15 +48,23 @@ export function SimuladoReviewModal({
         }.`,
         files: [arquivo],
       };
-      // Compartilha o PDF via Web Share API (celular). Fallback: baixa o PDF.
-      if (nav.share && (!nav.canShare || nav.canShare({ files: [arquivo] }))) {
+
+      // 1) Tenta abrir o menu de compartilhamento do sistema com o PDF
+      //    (celular: contatos, WhatsApp, e-mail...).
+      const podeCompartilharArquivo =
+        !!nav.share && (!nav.canShare || nav.canShare({ files: [arquivo] }));
+      if (podeCompartilharArquivo) {
         try {
           await nav.share(dados);
           return;
-        } catch {
-          // usuária cancelou ou falhou → cai no fallback de download
+        } catch (e) {
+          // Se a usuária cancelou o menu, não faz mais nada.
+          if (e instanceof DOMException && e.name === "AbortError") return;
+          // Outro erro → cai para o download abaixo.
         }
       }
+
+      // 2) Navegador sem compartilhamento de arquivo (ex.: desktop): baixa o PDF.
       baixar(arquivo);
     } catch {
       setErro("Não foi possível gerar o relatório em PDF.");
@@ -203,12 +195,10 @@ export function SimuladoReviewModal({
             <Button bloco onClick={compartilhar} disabled={compartilhando}>
               {compartilhando ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : canShareFiles() ? (
-                <Share2 className="h-4 w-4" />
               ) : (
-                <Download className="h-4 w-4" />
+                <Share2 className="h-4 w-4" />
               )}
-              {canShareFiles() ? "Compartilhar relatório" : "Baixar relatório"}
+              Compartilhar relatório
             </Button>
           </div>
         )}
