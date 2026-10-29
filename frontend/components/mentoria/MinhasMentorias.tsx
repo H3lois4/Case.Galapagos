@@ -17,8 +17,9 @@ export function MinhasMentorias({ mentorias, onMudou, compacto }: Props) {
   const [cancelandoId, setCancelandoId] = useState<number | null>(null);
   const [erro, setErro] = useState<string | null>(null);
 
+  // Nunca listamos canceladas. No modo compacto (perfil), só as futuras.
   const ativas = mentorias.filter((m) => m.status === "ativa");
-  const lista = compacto ? ativas.filter((m) => !m.passada) : mentorias;
+  const lista = compacto ? ativas.filter((m) => !m.passada) : ativas;
 
   async function cancelar(id: number) {
     if (!confirm("Cancelar esta mentoria?")) return;

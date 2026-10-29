@@ -8,6 +8,7 @@ import { ChatIA } from "@/components/ia/ChatIA";
 import { SlotCard } from "@/components/mentoria/SlotCard";
 import { SlotForm } from "@/components/mentoria/SlotForm";
 import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
+import { AgendarConfirmModal } from "@/components/mentoria/AgendarConfirmModal";
 import { apiAuthJson } from "@/lib/api";
 import type { Me, Mentoria, MentoriaSlot } from "@/lib/types";
 
@@ -22,6 +23,8 @@ export default function MentoriaPage() {
   const [agendandoId, setAgendandoId] = useState<number | null>(null);
   const [formAberto, setFormAberto] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  // Slot selecionado para confirmar o agendamento (pop-up com as regras).
+  const [slotConfirmar, setSlotConfirmar] = useState<MentoriaSlot | null>(null);
 
   async function carregar() {
     const [s, m] = await Promise.all([
@@ -48,9 +51,11 @@ export default function MentoriaPage() {
       setMinhas((atual) => [mentoria, ...atual]);
       setSlots((atual) => atual.filter((s) => s.id !== slot.id));
       setAviso("Mentoria agendada! Veja em “Minhas mentorias”.");
+      setSlotConfirmar(null);
     } catch (err) {
       const e = err as { corpo?: { detail?: string } };
       setAviso(e.corpo?.detail ?? "Não foi possível agendar.");
+      setSlotConfirmar(null);
       // Recarrega para refletir o estado real (ex.: slot tomado por outra).
       carregar();
     } finally {
@@ -113,7 +118,7 @@ export default function MentoriaPage() {
                         key={s.id}
                         slot={s}
                         agendando={agendandoId === s.id}
-                        onAgendar={() => agendar(s)}
+                        onAgendar={() => setSlotConfirmar(s)}
                       />
                     ))}
                   </div>
@@ -131,6 +136,15 @@ export default function MentoriaPage() {
         </div>
       ) : (
         <ChatIA agente="mentora" titulo="IA mentora" />
+      )}
+
+      {slotConfirmar && (
+        <AgendarConfirmModal
+          slot={slotConfirmar}
+          agendando={agendandoId === slotConfirmar.id}
+          onConfirmar={() => agendar(slotConfirmar)}
+          onFechar={() => setSlotConfirmar(null)}
+        />
       )}
 
       {formAberto && (
