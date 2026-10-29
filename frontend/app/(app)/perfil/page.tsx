@@ -10,6 +10,7 @@ import { ApiStatusBadge } from "@/components/diagnostico/ApiStatusBadge";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
 import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
+import { SimuladoReviewModal } from "@/components/pratica/SimuladoReviewModal";
 import { apiAuth, apiAuthJson } from "@/lib/api";
 import { enviarFotoPerfil, validarArquivo } from "@/lib/upload";
 import { invalidarAvatarCache } from "@/components/nav/AvatarUsuaria";
@@ -35,6 +36,7 @@ export default function PerfilPage() {
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
   const [fotoProgresso, setFotoProgresso] = useState<number | null>(null);
   const [fotoErro, setFotoErro] = useState<string | null>(null);
+  const [simuladoAberto, setSimuladoAberto] = useState<number | null>(null);
 
   useEffect(() => {
     apiAuthJson<Me>("/api/me/")
@@ -310,11 +312,17 @@ export default function PerfilPage() {
           ) : (
             <ul className="mt-2 space-y-1 text-[13px]">
               {simulados.slice(0, 5).map((s) => (
-                <li key={s.id} className="flex justify-between gap-3 text-tinta">
-                  <span className="truncate">{s.tema}</span>
-                  <span className="shrink-0 text-tinta-suave">
-                    {s.nota}/{s.total} · {dataCurta(s.criado_em)}
-                  </span>
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSimuladoAberto(s.id)}
+                    className="flex w-full items-center justify-between gap-3 rounded-chip px-2 py-1.5 text-left text-tinta transition-colors hover:bg-fundo-alt"
+                  >
+                    <span className="truncate">{s.tema}</span>
+                    <span className="shrink-0 text-tinta-suave">
+                      {s.nota}/{s.total} · {dataCurta(s.criado_em)}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -366,6 +374,13 @@ export default function PerfilPage() {
           <Trash2 className="h-4 w-4" /> Excluir conta
         </button>
       </div>
+
+      {simuladoAberto !== null && (
+        <SimuladoReviewModal
+          attemptId={simuladoAberto}
+          onFechar={() => setSimuladoAberto(null)}
+        />
+      )}
     </div>
   );
 }

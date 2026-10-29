@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Clock, Check, X as XIcon, ArrowLeft } from "lucide-react";
+import { Loader2, Clock, Check, X as XIcon, ArrowLeft, BookmarkCheck } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { apiAuthJson } from "@/lib/api";
@@ -207,9 +207,19 @@ function Resultado({
   resultado: ResultadoSimulado;
   onSair: () => void;
 }) {
+  const [salvo, setSalvo] = useState(false);
+  const [toast, setToast] = useState(false);
   const pct = resultado.total
     ? Math.round((resultado.nota / resultado.total) * 100)
     : 0;
+
+  // O simulado já é persistido ao finalizar; o botão confirma e avisa a usuária.
+  function salvar() {
+    setSalvo(true);
+    setToast(true);
+    setTimeout(() => setToast(false), 4000);
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-card border border-borda bg-azul-elas-suave/60 p-4 text-center">
@@ -261,9 +271,25 @@ function Resultado({
         ))}
       </ol>
 
+      <Button bloco onClick={salvar} disabled={salvo}>
+        <BookmarkCheck className="h-4 w-4" />
+        {salvo ? "Relatório salvo" : "Salvar relatório"}
+      </Button>
+
       <Button bloco variante="secondary" onClick={onSair}>
         Voltar aos temas
       </Button>
+
+      {/* Toast de confirmação */}
+      {toast && (
+        <div
+          role="status"
+          className="fixed inset-x-0 bottom-24 z-50 mx-auto flex w-fit items-center gap-2 rounded-pill bg-tinta px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg md:bottom-8"
+        >
+          <BookmarkCheck className="h-4 w-4 text-rosa-elas" />
+          Salvo em Minha jornada
+        </div>
+      )}
     </div>
   );
 }

@@ -19,6 +19,11 @@ urlpatterns = [
         views.SimuladoResponderView.as_view(),
         name="pratica-simulado-responder",
     ),
+    path(
+        "pratica/simulados/<int:pk>/",
+        views.SimuladoDetailView.as_view(),
+        name="pratica-simulado-detalhe",
+    ),
     path("pratica/entrevistas/", views.EntrevistaCriarView.as_view(), name="pratica-entrevista-criar"),
     path(
         "pratica/entrevistas/historico/",

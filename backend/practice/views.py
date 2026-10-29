@@ -19,7 +19,13 @@ from .serializers import (
     QuizAttemptHistSerializer,
 )
 from .services_interview import gerar_relatorio, iniciar_entrevista
-from .services_quiz import SemQuestoes, TemaInvalido, corrigir, iniciar
+from .services_quiz import (
+    SemQuestoes,
+    TemaInvalido,
+    corrigir,
+    iniciar,
+    montar_resultado,
+)
 from .temas import NOME_POR_SLUG, TEMAS
 
 
@@ -92,6 +98,20 @@ class SimuladoHistoricoView(APIView):
             profile=_profile(request), finalizado=True
         )
         return Response(QuizAttemptHistSerializer(qs, many=True).data)
+
+
+class SimuladoDetailView(APIView):
+    """Rever o relatório completo de um simulado salvo (Minha jornada)."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        attempt = get_object_or_404(
+            QuizAttempt, pk=pk, profile=_profile(request), finalizado=True
+        )
+        resultado = montar_resultado(attempt)
+        resultado["tema_nome"] = NOME_POR_SLUG.get(attempt.tema, attempt.tema)
+        return Response(resultado)
 
 
 class EntrevistaCriarView(APIView):

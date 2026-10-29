@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { ChatIA } from "@/components/ia/ChatIA";
 import { Simulado } from "@/components/pratica/Simulado";
+import { SimuladoInfoModal } from "@/components/pratica/SimuladoInfoModal";
 import { EntrevistaSetup } from "@/components/pratica/EntrevistaSetup";
 import { RelatorioEntrevista } from "@/components/pratica/RelatorioEntrevista";
 import { apiAuthJson } from "@/lib/api";
@@ -28,6 +29,8 @@ export default function PraticaPage() {
   const [temas, setTemas] = useState<TemaSimulado[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [temaAtivo, setTemaAtivo] = useState<string | null>(null);
+  // Tema selecionado para ver as informações antes de iniciar (pop-up).
+  const [temaInfo, setTemaInfo] = useState<TemaSimulado | null>(null);
 
   useEffect(() => {
     apiAuthJson<TemaSimulado[]>("/api/pratica/temas/")
@@ -68,7 +71,7 @@ export default function PraticaPage() {
                 key={t.slug}
                 type="button"
                 disabled={t.questoes === 0}
-                onClick={() => setTemaAtivo(t.slug)}
+                onClick={() => setTemaInfo(t)}
                 className={cn(
                   "flex h-full flex-col rounded-card border border-borda bg-fundo p-4 text-left shadow-[var(--sombra-card)] transition-transform",
                   t.questoes > 0
@@ -89,6 +92,17 @@ export default function PraticaPage() {
         )
       ) : (
         <Entrevista />
+      )}
+
+      {temaInfo && (
+        <SimuladoInfoModal
+          tema={temaInfo}
+          onFechar={() => setTemaInfo(null)}
+          onIniciar={() => {
+            setTemaAtivo(temaInfo.slug);
+            setTemaInfo(null);
+          }}
+        />
       )}
     </div>
   );

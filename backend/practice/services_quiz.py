@@ -97,6 +97,42 @@ def corrigir(attempt: QuizAttempt, respostas: dict) -> dict:
     }
 
 
+def montar_resultado(attempt: QuizAttempt) -> dict:
+    """Reconstrói o resultado completo de um attempt já finalizado.
+
+    Usado para rever um simulado salvo (em Minha jornada), sem re-corrigir.
+    """
+    questoes = {q.id: q for q in Question.objects.filter(id__in=attempt.questao_ids)}
+    revisao = []
+    for qid in attempt.questao_ids:
+        q = questoes.get(qid)
+        if not q:
+            continue
+        escolhida = attempt.respostas.get(str(qid), attempt.respostas.get(qid))
+        try:
+            escolhida = int(escolhida)
+        except (TypeError, ValueError):
+            escolhida = None
+        revisao.append(
+            {
+                "id": q.id,
+                "enunciado": q.enunciado,
+                "alternativas": q.alternativas,
+                "escolhida": escolhida,
+                "correta": q.correta,
+                "acertou": escolhida == q.correta,
+                "explicacao": q.explicacao,
+            }
+        )
+    return {
+        "attempt_id": attempt.id,
+        "tema": attempt.tema,
+        "nota": attempt.nota,
+        "total": attempt.total,
+        "revisao": revisao,
+    }
+
+
 def _questao_publica(q: Question) -> dict:
     """Payload sem gabarito nem explicação."""
     return {

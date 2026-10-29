@@ -243,6 +243,8 @@ export interface ResultadoSimulado {
   nota: number;
   total: number;
   revisao: RevisaoQuestao[];
+  /** Presente ao rever um simulado salvo (Minha jornada). */
+  tema_nome?: string;
 }
 
 export interface SimuladoHistorico {
