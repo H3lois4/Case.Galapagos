@@ -44,23 +44,37 @@ export async function comprimirImagem(
   if (arquivo.type === "image/gif") return arquivo;
 
   try {
-    const bitmap = await carregarBitmap(arquivo);
-    const { width, height } = bitmap;
-    const escala = Math.min(1, maxLado / Math.max(width, height));
-    const w = Math.round(width * escala);
-    const h = Math.round(height * escala);
+    // 1) Descobre as dimensões de forma barata (sem decodificar o bitmap cheio).
+    const dims = await lerDimensoes(arquivo);
+    if (!dims) return arquivo;
+
+    const escala = Math.min(1, maxLado / Math.max(dims.width, dims.height));
+    const w = Math.max(1, Math.round(dims.width * escala));
+    const h = Math.max(1, Math.round(dims.height * escala));
+
+    // 2) Decodifica JÁ no tamanho reduzido. Em Android/Chrome isso evita o
+    //    estouro de memória que recarrega a aba ao voltar da câmera, porque o
+    //    navegador nunca mantém o bitmap em resolução total.
+    const bitmap = await decodificarReduzido(arquivo, w, h);
+    if (!bitmap) return arquivo;
 
     const canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return arquivo;
+    if (!ctx) {
+      fechar(bitmap);
+      return arquivo;
+    }
     ctx.drawImage(bitmap, 0, 0, w, h);
-    if ("close" in bitmap && typeof bitmap.close === "function") bitmap.close();
+    fechar(bitmap);
 
     const blob = await new Promise<Blob | null>((resolve) =>
       canvas.toBlob(resolve, "image/jpeg", qualidade),
     );
+    // Libera o canvas (ajuda o GC no mobile).
+    canvas.width = 0;
+    canvas.height = 0;
     if (!blob) return arquivo;
 
     const nome = (arquivo.name || "foto").replace(/\.[^.]+$/, "") + ".jpg";
@@ -70,29 +84,65 @@ export async function comprimirImagem(
   }
 }
 
-/** Decodifica o arquivo em um ImageBitmap (com fallback via <img>). */
-async function carregarBitmap(
+/** Lê largura/altura via <img> (barato) sem manter o bitmap decodificado. */
+function lerDimensoes(
   arquivo: File,
-): Promise<ImageBitmap | HTMLImageElement> {
+): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(arquivo);
+    const img = document.createElement("img");
+    img.onload = () => {
+      const dims = { width: img.naturalWidth, height: img.naturalHeight };
+      URL.revokeObjectURL(url);
+      resolve(dims.width && dims.height ? dims : null);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+/**
+ * Decodifica o arquivo já no tamanho alvo (w×h). Prefere createImageBitmap com
+ * resize (decodifica reduzido, pouca memória). Cai para <img> + drawImage se
+ * necessário.
+ */
+async function decodificarReduzido(
+  arquivo: File,
+  w: number,
+  h: number,
+): Promise<ImageBitmap | HTMLImageElement | null> {
   if (typeof createImageBitmap === "function") {
     try {
-      return await createImageBitmap(arquivo);
+      return await createImageBitmap(arquivo, {
+        resizeWidth: w,
+        resizeHeight: h,
+        resizeQuality: "high",
+      });
     } catch {
-      /* cai para o fallback abaixo */
+      /* fallback abaixo */
     }
   }
-  const url = URL.createObjectURL(arquivo);
-  try {
+  // Fallback: <img> (o drawImage no canvas menor cuida do resize).
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(arquivo);
     const img = document.createElement("img");
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error("imagem inválida"));
-      img.src = url;
-    });
-    return img;
-  } finally {
-    URL.revokeObjectURL(url);
-  }
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+function fechar(bitmap: ImageBitmap | HTMLImageElement): void {
+  if ("close" in bitmap && typeof bitmap.close === "function") bitmap.close();
 }
 
 /** Lê a duração (em segundos) de um arquivo de vídeo pelo elemento <video>. */
