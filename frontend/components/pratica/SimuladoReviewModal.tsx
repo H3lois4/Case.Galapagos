@@ -1,10 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Check, X as XIcon, Loader2 } from "lucide-react";
+import { X, Check, X as XIcon, Loader2, Share2, Download } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { apiAuthJson } from "@/lib/api";
+import { gerarPdfSimulado } from "@/lib/pdfSimulado";
+import { Button } from "@/components/ui/Button";
 import type { ResultadoSimulado } from "@/lib/types";
+
+/** Verifica se o navegador suporta compartilhar arquivos (celular). */
+function canShareFiles(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const nav = navigator as Navigator & {
+    canShare?: (d: ShareData) => boolean;
+    share?: (d: ShareData) => Promise<void>;
+  };
+  if (!nav.share || !nav.canShare) return false;
+  try {
+    const amostra = new File([new Blob()], "x.pdf", { type: "application/pdf" });
+    return nav.canShare({ files: [amostra] });
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Pop-up que abre o relatório de um simulado já salvo (Minha jornada).
@@ -19,12 +37,60 @@ export function SimuladoReviewModal({
 }) {
   const [resultado, setResultado] = useState<ResultadoSimulado | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  const [compartilhando, setCompartilhando] = useState(false);
 
   useEffect(() => {
     apiAuthJson<ResultadoSimulado>(`/api/pratica/simulados/${attemptId}/`)
       .then(setResultado)
       .catch(() => setErro("Não foi possível carregar o relatório."));
   }, [attemptId]);
+
+  async function compartilhar() {
+    if (!resultado) return;
+    setCompartilhando(true);
+    try {
+      const arquivo = await gerarPdfSimulado(
+        resultado,
+        resultado.tema_nome ?? "Simulado",
+      );
+      const nav = navigator as Navigator & {
+        canShare?: (d: ShareData) => boolean;
+        share?: (d: ShareData) => Promise<void>;
+      };
+      const dados: ShareData = {
+        title: "Relatório de simulado — Por ELAS finance",
+        text: `Meu resultado: ${resultado.nota}/${resultado.total} em ${
+          resultado.tema_nome ?? "simulado"
+        }.`,
+        files: [arquivo],
+      };
+      // Compartilha o PDF via Web Share API (celular). Fallback: baixa o PDF.
+      if (nav.share && (!nav.canShare || nav.canShare({ files: [arquivo] }))) {
+        try {
+          await nav.share(dados);
+          return;
+        } catch {
+          // usuária cancelou ou falhou → cai no fallback de download
+        }
+      }
+      baixar(arquivo);
+    } catch {
+      setErro("Não foi possível gerar o relatório em PDF.");
+    } finally {
+      setCompartilhando(false);
+    }
+  }
+
+  function baixar(arquivo: File) {
+    const url = URL.createObjectURL(arquivo);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = arquivo.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   useEffect(() => {
     function aoTeclar(e: KeyboardEvent) {
@@ -133,6 +199,17 @@ export function SimuladoReviewModal({
                 </li>
               ))}
             </ol>
+
+            <Button bloco onClick={compartilhar} disabled={compartilhando}>
+              {compartilhando ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : canShareFiles() ? (
+                <Share2 className="h-4 w-4" />
+              ) : (
+                <Download className="h-4 w-4" />
+              )}
+              {canShareFiles() ? "Compartilhar relatório" : "Baixar relatório"}
+            </Button>
           </div>
         )}
       </div>
