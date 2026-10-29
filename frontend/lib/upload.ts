@@ -24,6 +24,77 @@ export const LIMITES: LimitesUpload = {
 export const TIPOS_VIDEO = ["video/mp4", "video/webm"];
 export const TIPOS_IMAGEM = ["image/jpeg", "image/png", "image/webp"];
 
+/**
+ * Redimensiona e recomprime uma imagem no navegador antes do upload.
+ *
+ * Resolve dois problemas de fotos vindas da câmera do celular:
+ *  - tamanho enorme (muitos MP) que estoura memória e faz o app recarregar;
+ *  - formatos como HEIC/HEIF que o backend não aceita — a saída é sempre JPEG.
+ *
+ * Mantém a proporção, limita o maior lado a `maxLado` px e exporta em JPEG.
+ * Se algo falhar (ex.: formato que o navegador não decodifica), devolve o
+ * arquivo original para o fluxo normal de validação tratar.
+ */
+export async function comprimirImagem(
+  arquivo: File,
+  maxLado = 1600,
+  qualidade = 0.82,
+): Promise<File> {
+  // GIF animado: não mexer (perderia a animação).
+  if (arquivo.type === "image/gif") return arquivo;
+
+  try {
+    const bitmap = await carregarBitmap(arquivo);
+    const { width, height } = bitmap;
+    const escala = Math.min(1, maxLado / Math.max(width, height));
+    const w = Math.round(width * escala);
+    const h = Math.round(height * escala);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return arquivo;
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    if ("close" in bitmap && typeof bitmap.close === "function") bitmap.close();
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", qualidade),
+    );
+    if (!blob) return arquivo;
+
+    const nome = (arquivo.name || "foto").replace(/\.[^.]+$/, "") + ".jpg";
+    return new File([blob], nome, { type: "image/jpeg" });
+  } catch {
+    return arquivo;
+  }
+}
+
+/** Decodifica o arquivo em um ImageBitmap (com fallback via <img>). */
+async function carregarBitmap(
+  arquivo: File,
+): Promise<ImageBitmap | HTMLImageElement> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      return await createImageBitmap(arquivo);
+    } catch {
+      /* cai para o fallback abaixo */
+    }
+  }
+  const url = URL.createObjectURL(arquivo);
+  try {
+    const img = document.createElement("img");
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("imagem inválida"));
+      img.src = url;
+    });
+    return img;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 /** Lê a duração (em segundos) de um arquivo de vídeo pelo elemento <video>. */
 export function lerDuracaoVideo(arquivo: File): Promise<number> {
   return new Promise((resolve, reject) => {

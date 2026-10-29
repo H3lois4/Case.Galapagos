@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { apiAuthJson } from "@/lib/api";
-import { enviarParaR2, validarArquivo } from "@/lib/upload";
+import { comprimirImagem, enviarParaR2, validarArquivo } from "@/lib/upload";
 import type { Post, TipoPost } from "@/lib/types";
 
 export function NovoPost({
@@ -23,22 +23,39 @@ export function NovoPost({
   const [vagaLocal, setVagaLocal] = useState("");
   const [vagaLink, setVagaLink] = useState("");
   const [imagem, setImagem] = useState<File | null>(null);
+  const [previa, setPrevia] = useState<string | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const [processando, setProcessando] = useState(false);
   const imgInput = useRef<HTMLInputElement>(null);
 
   async function escolherImagem(arquivo: File | null) {
     setErro(null);
     if (!arquivo) {
       setImagem(null);
+      setPrevia(null);
       return;
     }
-    const msg = await validarArquivo(arquivo, "imagem");
-    if (msg) {
-      setErro(msg);
-      return;
+    setProcessando(true);
+    try {
+      // Comprime/redimensiona (resolve crash de foto grande da câmera e HEIC).
+      const otimizada = await comprimirImagem(arquivo);
+      const msg = await validarArquivo(otimizada, "imagem");
+      if (msg) {
+        setErro(msg);
+        setImagem(null);
+        setPrevia(null);
+        return;
+      }
+      setImagem(otimizada);
+      setPrevia(URL.createObjectURL(otimizada));
+    } catch {
+      setErro("Não foi possível processar a imagem. Tente outra.");
+      setImagem(null);
+      setPrevia(null);
+    } finally {
+      setProcessando(false);
     }
-    setImagem(arquivo);
   }
 
   async function publicar(e: React.FormEvent) {
@@ -157,11 +174,24 @@ export function NovoPost({
         className="w-full resize-none rounded-chip border border-tinta-suave/50 bg-fundo-alt px-3.5 py-2.5 text-[15px] text-tinta placeholder:text-tinta-suave/70 focus:border-azul-elas focus:outline-none focus:ring-2 focus:ring-azul-elas/30"
       />
 
-      {imagem && (
-        <div className="mt-2 flex items-center justify-between rounded-chip bg-fundo-alt px-3 py-2 text-[13px] text-tinta">
-          <span className="truncate">{imagem.name}</span>
-          <button type="button" onClick={() => setImagem(null)} aria-label="Remover imagem">
-            <X className="h-4 w-4 text-tinta-suave hover:text-perigo" />
+      {previa && (
+        <div className="relative mt-2 inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={previa}
+            alt="Prévia"
+            className="max-h-48 rounded-card object-cover"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setImagem(null);
+              setPrevia(null);
+            }}
+            aria-label="Remover imagem"
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-pill bg-tinta/70 text-white hover:bg-perigo"
+          >
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}
@@ -172,18 +202,27 @@ export function NovoPost({
         <button
           type="button"
           onClick={() => imgInput.current?.click()}
-          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-tinta-suave hover:text-azul-elas"
+          disabled={processando}
+          className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-tinta-suave hover:text-azul-elas disabled:opacity-50"
         >
-          <ImagePlus className="h-4 w-4" /> Imagem
+          {processando ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ImagePlus className="h-4 w-4" />
+          )}
+          Imagem
         </button>
         <input
           ref={imgInput}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/*"
           className="hidden"
-          onChange={(e) => escolherImagem(e.target.files?.[0] ?? null)}
+          onChange={(e) => {
+            void escolherImagem(e.target.files?.[0] ?? null);
+            e.target.value = "";
+          }}
         />
-        <Button type="submit" className="h-10" disabled={enviando}>
+        <Button type="submit" className="h-10" disabled={enviando || processando}>
           {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           Publicar
         </Button>

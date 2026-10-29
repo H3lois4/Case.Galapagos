@@ -9,6 +9,7 @@ import {
   Briefcase,
   ExternalLink,
   Newspaper,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { apiAuth, apiAuthJson } from "@/lib/api";
@@ -28,6 +29,7 @@ export function PostCard({
   const [curtidas, setCurtidas] = useState(post.curtidas_count);
   const [comentarios, setComentarios] = useState(post.comentarios_count);
   const [mostrarComentarios, setMostrarComentarios] = useState(false);
+  const [imagemAberta, setImagemAberta] = useState(false);
 
   async function curtir() {
     // otimista
@@ -122,14 +124,21 @@ export function PostCard({
         </p>
       )}
 
-      {/* Imagem de post comum */}
+      {/* Imagem de post comum — miniatura; abre inteira ao clicar */}
       {post.tipo === "post" && post.imagem_url && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={post.imagem_url}
-          alt=""
-          className="mt-3 w-full rounded-card object-cover"
-        />
+        <button
+          type="button"
+          onClick={() => setImagemAberta(true)}
+          className="mt-3 block w-full overflow-hidden rounded-card"
+          aria-label="Ampliar imagem"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.imagem_url}
+            alt=""
+            className="max-h-80 w-full object-cover transition-transform hover:scale-[1.01]"
+          />
+        </button>
       )}
 
       {post.tipo === "noticia" && post.fonte_url && (
@@ -168,6 +177,33 @@ export function PostCard({
           postId={post.id}
           onMudouTotal={(d) => setComentarios((n) => Math.max(0, n + d))}
         />
+      )}
+
+      {/* Lightbox: imagem em tela cheia ao clicar na miniatura */}
+      {imagemAberta && post.imagem_url && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-tinta/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Imagem ampliada"
+          onClick={() => setImagemAberta(false)}
+        >
+          <button
+            type="button"
+            aria-label="Fechar"
+            className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-pill bg-white/15 text-white hover:bg-white/25"
+            onClick={() => setImagemAberta(false)}
+          >
+            <X className="h-5 w-5" />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={post.imagem_url}
+            alt=""
+            className="max-h-[90dvh] max-w-full rounded-card object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
     </article>
   );
