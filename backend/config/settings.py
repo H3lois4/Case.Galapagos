@@ -237,6 +237,13 @@ if not DEBUG:
     CSRF_TRUSTED_ORIGINS = env_list(
         "CSRF_TRUSTED_ORIGINS", "https://*.vercel.app"
     )
+    # Endurecimento de produção (a Vercel serve tudo via HTTPS).
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 ano
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 
 # ---------------------------------------------------------------------------
