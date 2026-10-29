@@ -58,6 +58,43 @@ export function NovoPost({
     }
   }
 
+  // Abre o seletor de arquivos/galeria. Quando o navegador suporta a File
+  // System Access API, usamos showOpenFilePicker, que abre direto a galeria/
+  // arquivos sem oferecer a câmera (o menu "Câmera/Filmadora" do Android some).
+  async function abrirSeletorImagem() {
+    type JanelaComPicker = Window & {
+      showOpenFilePicker?: (opts?: unknown) => Promise<Array<{ getFile: () => Promise<File> }>>;
+    };
+    const win = window as JanelaComPicker;
+    if (typeof win.showOpenFilePicker === "function") {
+      try {
+        const [handle] = await win.showOpenFilePicker({
+          multiple: false,
+          types: [
+            {
+              description: "Imagens",
+              accept: {
+                "image/jpeg": [".jpg", ".jpeg"],
+                "image/png": [".png"],
+                "image/webp": [".webp"],
+              },
+            },
+          ],
+          excludeAcceptAllOption: false,
+        });
+        if (handle) {
+          const arquivo = await handle.getFile();
+          void escolherImagem(arquivo);
+        }
+      } catch {
+        /* usuária cancelou ou API indisponível: não faz nada */
+      }
+      return;
+    }
+    // Fallback: input de arquivo tradicional.
+    imgInput.current?.click();
+  }
+
   async function publicar(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
@@ -201,7 +238,7 @@ export function NovoPost({
       <div className="mt-3 flex items-center justify-between">
         <button
           type="button"
-          onClick={() => imgInput.current?.click()}
+          onClick={abrirSeletorImagem}
           disabled={processando}
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-tinta-suave hover:text-azul-elas disabled:opacity-50"
         >
@@ -210,7 +247,7 @@ export function NovoPost({
           ) : (
             <ImagePlus className="h-4 w-4" />
           )}
-          Imagem da galeria
+          Imagem
         </button>
         <input
           ref={imgInput}
