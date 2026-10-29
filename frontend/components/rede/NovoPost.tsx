@@ -210,12 +210,12 @@ export function NovoPost({
           ) : (
             <ImagePlus className="h-4 w-4" />
           )}
-          Imagem
+          Imagem da galeria
         </button>
         <input
           ref={imgInput}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           className="hidden"
           onChange={(e) => {
             void escolherImagem(e.target.files?.[0] ?? null);
