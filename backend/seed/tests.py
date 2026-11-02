@@ -15,10 +15,10 @@ class SeedDemoTests(TestCase):
     def test_cria_dados(self):
         call_command("seed_demo")
         self.assertEqual(
-            Company.objects.filter(status=Company.STATUS_APROVADA).count(), 2
+            Company.objects.filter(status=Company.STATUS_APROVADA).count(), 1
         )
         self.assertEqual(
-            Profile.objects.filter(supabase_sub__startswith="demo-").count(), 4
+            Profile.objects.filter(supabase_sub__startswith="demo-").count(), 3
         )
         self.assertTrue(Lesson.objects.filter(origem=Lesson.ORIGEM_IA).exists())
         self.assertTrue(MentorshipSlot.objects.exists())

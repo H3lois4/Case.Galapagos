@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Check, X as XIcon, Loader2, Share2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { apiAuthJson } from "@/lib/api";
-import { gerarPdfSimulado } from "@/lib/pdfSimulado";
+import { gerarImagemSimulado } from "@/lib/imgSimulado";
 import { Button } from "@/components/ui/Button";
 import type { ResultadoSimulado } from "@/lib/types";
 
@@ -33,7 +33,9 @@ export function SimuladoReviewModal({
     if (!resultado) return;
     setCompartilhando(true);
     try {
-      const arquivo = await gerarPdfSimulado(
+      // Gera o relatório como IMAGEM (PNG) — melhor suporte na Web Share API
+      // de celulares (ex.: Samsung Internet) do que PDF.
+      const arquivo = await gerarImagemSimulado(
         resultado,
         resultado.tema_nome ?? "Simulado",
       );
@@ -49,8 +51,7 @@ export function SimuladoReviewModal({
         files: [arquivo],
       };
 
-      // 1) Tenta abrir o menu de compartilhamento do sistema com o PDF
-      //    (celular: contatos, WhatsApp, e-mail...).
+      // Abre o menu de compartilhamento do sistema com a imagem.
       const podeCompartilharArquivo =
         !!nav.share && (!nav.canShare || nav.canShare({ files: [arquivo] }));
       if (podeCompartilharArquivo) {
@@ -58,16 +59,14 @@ export function SimuladoReviewModal({
           await nav.share(dados);
           return;
         } catch (e) {
-          // Se a usuária cancelou o menu, não faz mais nada.
           if (e instanceof DOMException && e.name === "AbortError") return;
-          // Outro erro → cai para o download abaixo.
         }
       }
 
-      // 2) Navegador sem compartilhamento de arquivo (ex.: desktop): baixa o PDF.
+      // Fallback (navegador sem compartilhamento de arquivo): baixa a imagem.
       baixar(arquivo);
     } catch {
-      setErro("Não foi possível gerar o relatório em PDF.");
+      setErro("Não foi possível gerar o relatório.");
     } finally {
       setCompartilhando(false);
     }

@@ -7,10 +7,10 @@
 
 import type { AreaDetalhe } from "@/lib/types";
 
-const AZUL: [number, number, number] = [31, 78, 158]; // azul-elas
+const AZUL: [number, number, number] = [153, 5, 33]; // vinho (#990521)
 const ROSA: [number, number, number] = [235, 131, 158]; // rosa-elas
-const TINTA: [number, number, number] = [26, 29, 43];
-const SUAVE: [number, number, number] = [91, 96, 112];
+const TINTA: [number, number, number] = [58, 31, 38]; // ameixa (#3A1F26)
+const SUAVE: [number, number, number] = [122, 97, 104]; // malva (#7A6168)
 
 export async function baixarPdfArea(area: AreaDetalhe): Promise<void> {
   const { jsPDF } = await import("jspdf");

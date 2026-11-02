@@ -1,38 +1,44 @@
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
+import topo from "@/public/brand/topo-crop.png";
+
 /**
- * Símbolo da marca: barras de gráfico + seta subindo.
- * Placeholder até a logo oficial chegar em public/brand/.
- * `corRosa` controla a cor do símbolo (padrão rosa da marca).
+ * Símbolo da marca: dois anéis entrelaçados (um vinho, um rosa).
+ * Mantido como SVG para usos em que só o símbolo é necessário (ex.: fallback).
  */
 export function LogoMark({
   className,
-  corRosa = "currentColor",
+  corAnel1 = "#990521",
+  corAnel2 = "#EB839E",
 }: {
   className?: string;
-  corRosa?: string;
+  corAnel1?: string;
+  corAnel2?: string;
 }) {
   return (
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 64 44"
       fill="none"
-      stroke={corRosa}
-      strokeWidth={2.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={cn("h-5 w-5", className)}
+      className={cn("h-6 w-auto", className)}
       aria-hidden="true"
     >
-      <path d="M4 20V11M10 20V7M16 20v-4" />
-      <path d="M14 5h6v6" />
-      <path d="M20 5l-9 9" />
+      <circle cx="40" cy="22" r="14" stroke={corAnel2} strokeWidth="6" />
+      <circle cx="24" cy="22" r="14" stroke={corAnel1} strokeWidth="6" />
+      <path
+        d="M40 36a14 14 0 0 0 11.9 -6.6"
+        stroke={corAnel2}
+        strokeWidth="6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
 
 /**
- * Logo completa: símbolo + "Por ELAS finance".
- * O "finance" é mais leve. Usada sobre bloco azul.
+ * Logo oficial "Por Elas Finance" (imagem). Usada no cabeçalho e no menu
+ * lateral, sobre fundo claro (creme), combinando com o fundo da própria arte.
+ * `compacta` reduz um pouco a altura.
  */
 export function Logo({
   className,
@@ -42,16 +48,15 @@ export function Logo({
   compacta?: boolean;
 }) {
   return (
-    <span
+    <Image
+      src={topo}
+      alt="Por Elas finance"
+      priority
       className={cn(
-        "inline-flex items-center gap-2 rounded-botao bg-azul-elas px-3 py-1.5 font-titulo text-white",
+        "w-auto object-contain",
+        compacta ? "h-7" : "h-9",
         className,
       )}
-    >
-      <LogoMark corRosa="#EB839E" className="h-4 w-4" />
-      <span className="text-sm font-extrabold tracking-tight">
-        Por ELAS{!compacta && <span className="font-semibold"> finance</span>}
-      </span>
-    </span>
+    />
   );
 }

@@ -2,28 +2,32 @@
 
 /* ==========================================================================
    Por ELAS finance — tokens do design system
-   Azul dominante, acentos em rosa. Tema claro e escuro (segue o sistema,
+   Vinho dominante, acentos em rosa. Tema claro e escuro (segue o sistema,
    com override por classe .dark no <html>).
+
+   Os nomes dos tokens continuam `azul-elas` por compatibilidade com o código
+   existente (bg-azul-elas, text-azul-elas, ...), mas os valores agora são da
+   nova identidade (vinho + rosa).
    ========================================================================== */
 
 :root {
-  --azul-elas: #1f4e9e;
-  --azul-elas-escuro: #163b78;
-  --azul-elas-suave: #e6edf8;
-  --rosa-elas: #eb839e;
-  --rosa-elas-texto: #b3365e;
-  --rosa-elas-suave: #fce8ee;
-  --cinza-logo: #dddddd;
-  --fundo: #ffffff;
-  --fundo-alt: #f6f5f8;
-  --tinta: #1a1d2b;
-  --tinta-suave: #5b6070;
-  --borda: #e3e2e7;
-  --sucesso: #1a7a4c;
+  --azul-elas: #990521; /* Vinho — principal */
+  --azul-elas-escuro: #6e0418; /* Vinho profundo — pressionado/ênfase */
+  --azul-elas-suave: #f7dce2; /* Blush — fundos de destaque, chips */
+  --rosa-elas: #eb839e; /* Rosa Elas — destaque */
+  --rosa-elas-texto: #b3365e; /* rosa para texto (contraste em fundo claro) */
+  --rosa-elas-suave: #fbedef; /* Névoa rosé — fundos de seções/cards de meta */
+  --cinza-logo: #e7d9dc;
+  --fundo: #fff9f7; /* Creme — fundo principal */
+  --fundo-alt: #fbedef; /* Névoa rosé — campos e seções */
+  --tinta: #3a1f26; /* Ameixa — texto principal */
+  --tinta-suave: #7a6168; /* Malva — texto secundário, legendas, datas */
+  --borda: #ecdfe2;
+  --sucesso: #3d7a5c; /* Sálvia */
   --perigo: #c8323c;
-  --alerta: #9a6412;
+  --alerta: #b5530f; /* Terracota */
 
-  --sombra-card: 0 1px 2px rgba(26, 29, 43, 0.06), 0 6px 20px rgba(26, 29, 43, 0.05);
+  --sombra-card: 0 1px 2px rgba(58, 31, 38, 0.06), 0 6px 20px rgba(58, 31, 38, 0.06);
 
   --raio-chip: 8px;
   --raio-botao: 12px;
@@ -31,45 +35,45 @@
   --raio-pill: 999px;
 }
 
-/* Tema escuro automático (preferência do sistema) */
+/* Tema escuro automático (preferência do sistema) — tons de vinho/rosa */
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --azul-elas: #6f98e0;
-    --azul-elas-escuro: #9dbbee;
-    --azul-elas-suave: #1b2742;
+    --azul-elas: #e8829a; /* rosa-vinho claro para contraste no escuro */
+    --azul-elas-escuro: #f0a3b4;
+    --azul-elas-suave: #3a1620; /* vinho bem escuro para fundos de destaque */
     --rosa-elas: #eb839e;
-    --rosa-elas-texto: #f29bb2;
-    --rosa-elas-suave: #3a1f2a;
-    --cinza-logo: #2a2d38;
-    --fundo: #12141c;
-    --fundo-alt: #1c1f2a;
-    --tinta: #f2f2f5;
-    --tinta-suave: #a3a7b5;
-    --borda: #2e3240;
-    --sucesso: #4fc08d;
+    --rosa-elas-texto: #f2a0b4;
+    --rosa-elas-suave: #2e1620;
+    --cinza-logo: #3a2a2f;
+    --fundo: #1a1015; /* ameixa/vinho muito escuro */
+    --fundo-alt: #241319;
+    --tinta: #f6ecee;
+    --tinta-suave: #c3a9b0;
+    --borda: #3a2731;
+    --sucesso: #5ec08d;
     --perigo: #f2737b;
-    --alerta: #e3a64a;
+    --alerta: #e0a05a;
     --sombra-card: none;
   }
 }
 
 /* Override manual por classe (caso a usuária force um tema) */
 :root.dark {
-  --azul-elas: #6f98e0;
-  --azul-elas-escuro: #9dbbee;
-  --azul-elas-suave: #1b2742;
+  --azul-elas: #e8829a;
+  --azul-elas-escuro: #f0a3b4;
+  --azul-elas-suave: #3a1620;
   --rosa-elas: #eb839e;
-  --rosa-elas-texto: #f29bb2;
-  --rosa-elas-suave: #3a1f2a;
-  --cinza-logo: #2a2d38;
-  --fundo: #12141c;
-  --fundo-alt: #1c1f2a;
-  --tinta: #f2f2f5;
-  --tinta-suave: #a3a7b5;
-  --borda: #2e3240;
-  --sucesso: #4fc08d;
+  --rosa-elas-texto: #f2a0b4;
+  --rosa-elas-suave: #2e1620;
+  --cinza-logo: #3a2a2f;
+  --fundo: #1a1015;
+  --fundo-alt: #241319;
+  --tinta: #f6ecee;
+  --tinta-suave: #c3a9b0;
+  --borda: #3a2731;
+  --sucesso: #5ec08d;
   --perigo: #f2737b;
-  --alerta: #e3a64a;
+  --alerta: #e0a05a;
   --sombra-card: none;
 }
 

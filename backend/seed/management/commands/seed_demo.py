@@ -25,7 +25,7 @@ from network.models import Post
 
 # Marcadores de demo (prefixos estáveis).
 DEMO_SUB_PREFIX = "demo-"
-DEMO_SLUGS = ["demo-galapagos", "demo-azul-capital"]
+DEMO_SLUGS = ["demo-galapagos"]
 
 # Vídeo público de teste (não depende do R2).
 VIDEO_DEMO = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4"
@@ -39,13 +39,6 @@ EMPRESAS = [
         "descricao": "Gestora e banco de investimentos — conta de demonstração.",
         "site": "https://galapagoscapital.com",
     },
-    {
-        "slug": "demo-azul-capital",
-        "nome": "Azul Capital (demo)",
-        "dominio": "azulcapital.demo",
-        "descricao": "Casa de análise e investimentos — conta de demonstração.",
-        "site": "https://example.com",
-    },
 ]
 
 PERFIS = [
@@ -55,8 +48,6 @@ PERFIS = [
      "descricao": "Estudando para a CPA-20."},
     {"sub": "demo-galapagos-rh", "username": "galapagos.rh", "nome": "RH Galapagos (demo)",
      "tipo": "empresa", "empresa": "demo-galapagos"},
-    {"sub": "demo-azul-rh", "username": "azul.rh", "nome": "RH Azul (demo)",
-     "tipo": "empresa", "empresa": "demo-azul-capital"},
 ]
 
 
@@ -135,9 +126,7 @@ class Command(BaseCommand):
 
     def _aulas(self, empresas, perfis):
         galap = empresas["demo-galapagos"]
-        azul = empresas["demo-azul-capital"]
         rh_g = perfis["demo-galapagos-rh"]
-        rh_a = perfis["demo-azul-rh"]
         dados = [
             dict(company=galap, autor=rh_g, origem=Lesson.ORIGEM_EMPRESA,
                  titulo="Como funciona um banco de investimentos",
@@ -147,7 +136,7 @@ class Command(BaseCommand):
                  titulo="Carreira em M&A: por onde começar",
                  descricao="Dicas de quem atua na área.",
                  video_url=VIDEO_DEMO, duracao_seg=10),
-            dict(company=azul, autor=rh_a, origem=Lesson.ORIGEM_EMPRESA,
+            dict(company=galap, autor=rh_g, origem=Lesson.ORIGEM_EMPRESA,
                  titulo="Análise de empresas na prática",
                  descricao="Primeiros passos em research.",
                  video_url=VIDEO_DEMO, duracao_seg=10),
@@ -171,9 +160,9 @@ class Command(BaseCommand):
                  mentora_nome="Carla Mentora", mentora_cargo="Diretora de M&A",
                  mentora_email="carla@galapagoscapital.com",
                  tema="Carreira em Investment Banking", inicio=agora + timedelta(days=7)),
-            dict(company=empresas["demo-azul-capital"], criado_por=perfis["demo-azul-rh"],
+            dict(company=empresas["demo-galapagos"], criado_por=perfis["demo-galapagos-rh"],
                  mentora_nome="Duda Mentora", mentora_cargo="Head de Research",
-                 mentora_email="duda@azulcapital.demo",
+                 mentora_email="duda@galapagoscapital.com",
                  tema="Primeiros passos em Research", inicio=agora + timedelta(days=14)),
         ]
         for d in dados:
