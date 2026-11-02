@@ -7,7 +7,7 @@ import { AvatarUsuaria } from "@/components/nav/AvatarUsuaria";
  */
 export function TopBar() {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-borda bg-fundo/95 px-4 py-3 backdrop-blur">
+    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-borda bg-topo px-4 py-3">
       <div className="md:hidden">
         <Logo />
       </div>

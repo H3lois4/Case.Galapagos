@@ -27,6 +27,8 @@
   --perigo: #c8323c;
   --alerta: #b5530f; /* Terracota */
 
+  --topo: #f8ecee; /* fundo do cabeçalho — igual ao fundo da arte da logo */
+
   --sombra-card: 0 1px 2px rgba(58, 31, 38, 0.06), 0 6px 20px rgba(58, 31, 38, 0.06);
 
   --raio-chip: 8px;
@@ -53,6 +55,7 @@
     --sucesso: #5ec08d;
     --perigo: #f2737b;
     --alerta: #e0a05a;
+    --topo: #241319; /* cabeçalho no escuro */
     --sombra-card: none;
   }
 }
@@ -74,6 +77,7 @@
   --sucesso: #5ec08d;
   --perigo: #f2737b;
   --alerta: #e0a05a;
+  --topo: #241319;
   --sombra-card: none;
 }
 
@@ -96,6 +100,7 @@
   --color-sucesso: var(--sucesso);
   --color-perigo: var(--perigo);
   --color-alerta: var(--alerta);
+  --color-topo: var(--topo);
 
   --radius-chip: var(--raio-chip);
   --radius-botao: var(--raio-botao);
