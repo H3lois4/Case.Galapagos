@@ -14,7 +14,7 @@ from django.conf import settings
 from jwt import PyJWKClient
 from rest_framework import authentication, exceptions
 
-from .models import Profile
+from .models import Company, Profile
 
 
 class ProfileUser:
@@ -136,6 +136,24 @@ class SupabaseJWTAuthentication(authentication.BaseAuthentication):
         if deve_ser_admin and not profile.is_admin:
             profile.is_admin = True
             profile.save(update_fields=["is_admin"])
+
+        # A administradora representa a Galapagos: garante a empresa (aprovada)
+        # e vincula o perfil a ela para poder postar vídeos, marcar mentorias e
+        # publicar na Rede como Galapagos. Idempotente.
+        if profile.is_admin and profile.company_id is None:
+            company, _ = Company.objects.get_or_create(
+                slug="galapagos-capital",
+                defaults={
+                    "nome": "Galapagos Capital",
+                    "status": Company.STATUS_APROVADA,
+                },
+            )
+            if not company.aprovada:
+                company.status = Company.STATUS_APROVADA
+                company.save(update_fields=["status"])
+            profile.company = company
+            profile.account_type = Profile.TIPO_EMPRESA
+            profile.save(update_fields=["company", "account_type"])
         return profile
 
     def authenticate_header(self, request):

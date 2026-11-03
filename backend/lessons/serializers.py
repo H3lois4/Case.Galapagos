@@ -48,6 +48,11 @@ class LessonCreateSerializer(serializers.ModelSerializer):
 
     video_key = serializers.CharField(max_length=512)
     thumb_key = serializers.CharField(max_length=512, required=False, allow_blank=True)
+    # Só a administradora usa: "ia" publica como Por ELAS; "empresa" publica
+    # como a empresa que ela representa (Galapagos). Ignorado para empresas.
+    postar_como = serializers.ChoiceField(
+        choices=["ia", "empresa"], required=False, write_only=True
+    )
 
     class Meta:
         model = Lesson
@@ -58,6 +63,7 @@ class LessonCreateSerializer(serializers.ModelSerializer):
             "thumb_key",
             "duracao_seg",
             "tamanho_bytes",
+            "postar_como",
         )
 
     def validate_titulo(self, value: str) -> str:

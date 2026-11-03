@@ -15,13 +15,18 @@ import type { Aula } from "@/lib/types";
 interface Props {
   onFechar: () => void;
   onCriada: (aula: Aula) => void;
+  /** Administradora (Por ELAS): mostra o seletor "Publicar como". */
+  ehAdmin?: boolean;
 }
+
+type PostarComo = "ia" | "empresa";
 
 type Etapa = "form" | "enviando-video" | "enviando-thumb" | "salvando";
 
-export function UploadAulaModal({ onFechar, onCriada }: Props) {
+export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
+  const [postarComo, setPostarComo] = useState<PostarComo>("ia");
   const [video, setVideo] = useState<File | null>(null);
   const [thumb, setThumb] = useState<File | null>(null);
   const [erro, setErro] = useState<string | null>(null);
@@ -104,6 +109,7 @@ export function UploadAulaModal({ onFechar, onCriada }: Props) {
           thumb_key: thumbKey,
           duracao_seg: duracao,
           tamanho_bytes: video.size,
+          ...(ehAdmin ? { postar_como: postarComo } : {}),
         }),
       });
       onCriada(aula);
@@ -146,6 +152,42 @@ export function UploadAulaModal({ onFechar, onCriada }: Props) {
         </div>
 
         <form onSubmit={publicar} className="space-y-4">
+          {ehAdmin && (
+            <div>
+              <span className="mb-1.5 block text-[13px] font-semibold text-tinta">
+                Publicar como
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={enviando}
+                  onClick={() => setPostarComo("ia")}
+                  aria-pressed={postarComo === "ia"}
+                  className={`flex-1 rounded-chip border px-3 py-2.5 text-[14px] font-semibold transition disabled:opacity-50 ${
+                    postarComo === "ia"
+                      ? "border-azul-elas bg-azul-elas-suave text-azul-elas"
+                      : "border-tinta-suave/50 bg-fundo-alt text-tinta-suave hover:border-azul-elas"
+                  }`}
+                >
+                  Por ELAS
+                </button>
+                <button
+                  type="button"
+                  disabled={enviando}
+                  onClick={() => setPostarComo("empresa")}
+                  aria-pressed={postarComo === "empresa"}
+                  className={`flex-1 rounded-chip border px-3 py-2.5 text-[14px] font-semibold transition disabled:opacity-50 ${
+                    postarComo === "empresa"
+                      ? "border-azul-elas bg-azul-elas-suave text-azul-elas"
+                      : "border-tinta-suave/50 bg-fundo-alt text-tinta-suave hover:border-azul-elas"
+                  }`}
+                >
+                  Galapagos Capital
+                </button>
+              </div>
+            </div>
+          )}
+
           <Input
             name="titulo"
             rotulo="Título"

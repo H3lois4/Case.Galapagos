@@ -84,7 +84,8 @@ export default function AulasPage() {
       .catch(() => {});
   }
 
-  const podePublicar = me?.empresa_status === "aprovada";
+  const ehAdmin = !!me?.is_admin;
+  const podePublicar = ehAdmin || me?.empresa_status === "aprovada";
 
   // Agrupa por seção quando o filtro é "todas"; caso contrário, uma lista só.
   const aulasIa = aulas.filter((a) => a.origem === "ia");
@@ -166,6 +167,7 @@ export default function AulasPage() {
         <UploadAulaModal
           onFechar={() => setModalAberto(false)}
           onCriada={aoCriarAula}
+          ehAdmin={ehAdmin}
         />
       )}
     </div>

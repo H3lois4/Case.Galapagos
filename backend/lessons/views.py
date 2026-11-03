@@ -18,7 +18,7 @@ from accounts.models import Company
 
 from . import storage
 from .models import Lesson
-from .permissions import EmpresaAprovada
+from .permissions import PodePublicarAula
 from .serializers import (
     LessonCreateSerializer,
     LessonEditSerializer,
@@ -36,7 +36,7 @@ class AulasView(APIView):
 
     def get_permissions(self):
         if self.request.method == "POST":
-            return [IsAuthenticated(), EmpresaAprovada()]
+            return [IsAuthenticated(), PodePublicarAula()]
         return [IsAuthenticated()]
 
     def get(self, request):
@@ -68,10 +68,22 @@ class AulasView(APIView):
 
         video_key = dados["video_key"]
         thumb_key = dados.get("thumb_key", "")
+
+        # A administradora escolhe publicar como Por ELAS (origem "ia", sem
+        # empresa) ou como a empresa que representa (Galapagos). Empresas comuns
+        # sempre publicam em seu próprio nome.
+        postar_como = dados.get("postar_como")
+        if profile.is_admin and postar_como == "ia":
+            company = None
+            origem = Lesson.ORIGEM_IA
+        else:
+            company = profile.company
+            origem = Lesson.ORIGEM_EMPRESA
+
         aula = Lesson.objects.create(
-            company=profile.company,
+            company=company,
             autor=profile,
-            origem=Lesson.ORIGEM_EMPRESA,
+            origem=origem,
             titulo=dados["titulo"],
             descricao=dados.get("descricao", ""),
             video_key=video_key,
@@ -93,6 +105,8 @@ class AulaDetailView(APIView):
 
     def _dono(self, request, aula: Lesson) -> bool:
         profile = _profile(request)
+        if profile.is_admin:  # administradora modera/edita qualquer aula
+            return True
         return bool(
             aula.company_id
             and profile.company_id
@@ -154,9 +168,9 @@ class EmpresasComAulasView(APIView):
 
 
 class UploadUrlView(APIView):
-    """Gera a URL pré-assinada para upload direto no R2 (empresa aprovada)."""
+    """Gera a URL pré-assinada para upload direto no R2 (admin ou empresa)."""
 
-    permission_classes = [IsAuthenticated, EmpresaAprovada]
+    permission_classes = [IsAuthenticated, PodePublicarAula]
 
     def post(self, request):
         if not storage.r2_configurado():
