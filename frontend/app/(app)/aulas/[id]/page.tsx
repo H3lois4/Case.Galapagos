@@ -10,6 +10,7 @@ import {
   Trash2,
   Sparkles,
   Building2,
+  PlayCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -42,6 +43,8 @@ export default function PlayerAulaPage({
   const [salvando, setSalvando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
   const [form, setForm] = useState({ titulo: "", descricao: "" });
+  // Para aulas do YouTube: só carrega o iframe depois do clique (lazy).
+  const [tocandoYoutube, setTocandoYoutube] = useState(false);
 
   useEffect(() => {
     apiAuthJson<Aula>(`/api/aulas/${id}/`)
@@ -111,15 +114,52 @@ export default function PlayerAulaPage({
 
       {/* Player */}
       <div className="overflow-hidden rounded-card border border-borda bg-black">
-        <video
-          controls
-          playsInline
-          poster={aula.thumb_url || undefined}
-          className="aspect-video w-full bg-black"
-          src={aula.video_url}
-        >
-          Seu navegador não suporta vídeo.
-        </video>
+        {aula.youtube_id ? (
+          tocandoYoutube ? (
+            <div className="aspect-video w-full bg-black">
+              <iframe
+                className="h-full w-full"
+                src={`https://www.youtube-nocookie.com/embed/${aula.youtube_id}?autoplay=1&rel=0&modestbranding=1`}
+                title={aula.titulo}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setTocandoYoutube(true)}
+              aria-label="Reproduzir vídeo"
+              className="group relative block aspect-video w-full bg-black"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={
+                  aula.thumb_url ||
+                  `https://i.ytimg.com/vi/${aula.youtube_id}/hqdefault.jpg`
+                }
+                alt={aula.titulo}
+                className="h-full w-full object-cover opacity-90 transition group-hover:opacity-100"
+              />
+              <span className="absolute inset-0 flex items-center justify-center">
+                <PlayCircle
+                  className="h-16 w-16 text-white drop-shadow-lg transition-transform group-hover:scale-110"
+                  strokeWidth={1.5}
+                />
+              </span>
+            </button>
+          )
+        ) : (
+          <video
+            controls
+            playsInline
+            poster={aula.thumb_url || undefined}
+            className="aspect-video w-full bg-black"
+            src={aula.video_url}
+          >
+            Seu navegador não suporta vídeo.
+          </video>
+        )}
       </div>
 
       {editando ? (

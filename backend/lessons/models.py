@@ -37,7 +37,10 @@ class Lesson(models.Model):
     titulo = models.CharField(max_length=160)
     descricao = models.TextField(blank=True)
     video_key = models.CharField(max_length=512, blank=True)  # chave do objeto no R2
-    video_url = models.URLField(max_length=700)  # URL pública de leitura
+    video_url = models.URLField(max_length=700, blank=True)  # URL pública (R2)
+    # Quando a aula é um vídeo do YouTube, guardamos só o ID (11 chars). Nesse
+    # caso video_key/video_url ficam vazios e o player usa o embed do YouTube.
+    youtube_id = models.CharField(max_length=20, blank=True)
     thumb_key = models.CharField(max_length=512, blank=True)
     thumb_url = models.URLField(max_length=700, blank=True)
     duracao_seg = models.PositiveIntegerField(default=0)
@@ -64,3 +67,7 @@ class Lesson(models.Model):
         if self.origem == self.ORIGEM_IA:
             return "Por ELAS"
         return self.company.nome if self.company else "Por ELAS"
+
+    @property
+    def eh_youtube(self) -> bool:
+        return bool(self.youtube_id)

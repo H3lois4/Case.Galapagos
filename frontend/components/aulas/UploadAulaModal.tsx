@@ -1,7 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { X, UploadCloud, Loader2, FileVideo, ImagePlus } from "lucide-react";
+import {
+  X,
+  UploadCloud,
+  Loader2,
+  FileVideo,
+  ImagePlus,
+  MonitorPlay,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { apiAuthJson } from "@/lib/api";
@@ -20,17 +27,38 @@ interface Props {
 }
 
 type PostarComo = "ia" | "empresa";
+type Fonte = "upload" | "youtube";
 
 type Etapa = "form" | "enviando-video" | "enviando-thumb" | "salvando";
 
+/** Extrai o ID (11 chars) de um link do YouTube, ou null se inválido. */
+function extrairYoutubeId(url: string): string | null {
+  const u = url.trim();
+  if (!u) return null;
+  if (/^[A-Za-z0-9_-]{11}$/.test(u)) return u;
+  const padroes = [
+    /(?:youtube\.com\/watch\?(?:.*&)?v=)([A-Za-z0-9_-]{11})/,
+    /(?:youtu\.be\/)([A-Za-z0-9_-]{11})/,
+    /(?:youtube\.com\/(?:embed|shorts|v)\/)([A-Za-z0-9_-]{11})/,
+  ];
+  for (const p of padroes) {
+    const m = u.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
+
 export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) {
+  const [fonte, setFonte] = useState<Fonte>("upload");
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [postarComo, setPostarComo] = useState<PostarComo>("ia");
   const [video, setVideo] = useState<File | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [thumb, setThumb] = useState<File | null>(null);
   const [erro, setErro] = useState<string | null>(null);
   const [erroVideo, setErroVideo] = useState<string | null>(null);
+  const [erroYoutube, setErroYoutube] = useState<string | null>(null);
   const [erroThumb, setErroThumb] = useState<string | null>(null);
   const [etapa, setEtapa] = useState<Etapa>("form");
   const [progresso, setProgresso] = useState(0);
@@ -72,25 +100,49 @@ export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) 
   async function publicar(e: React.FormEvent) {
     e.preventDefault();
     setErro(null);
+    setErroVideo(null);
+    setErroYoutube(null);
+
     if (!titulo.trim()) {
       setErro("Dê um título para a aula.");
       return;
     }
-    if (!video) {
-      setErroVideo("Escolha um arquivo de vídeo.");
+
+    // Valida o conteúdo conforme a fonte escolhida.
+    let youtubeId: string | null = null;
+    if (fonte === "upload") {
+      if (!video) {
+        setErroVideo("Escolha um arquivo de vídeo.");
+        return;
+      }
+    } else {
+      youtubeId = extrairYoutubeId(youtubeUrl);
+      if (!youtubeId) {
+        setErroYoutube("Cole um link válido do YouTube.");
+        return;
+      }
+    }
+
+    // A miniatura é obrigatória para link do YouTube (não temos o frame do
+    // vídeo); para upload é opcional.
+    if (fonte === "youtube" && !thumb) {
+      setErroThumb("Escolha uma imagem de miniatura para a aula do YouTube.");
       return;
     }
 
     try {
-      // 1) duração (já validada, mas reusamos o valor para salvar)
-      const duracao = await lerDuracaoVideo(video);
+      let videoKey = "";
+      let duracao = 0;
 
-      // 2) upload do vídeo
-      setEtapa("enviando-video");
-      setProgresso(0);
-      const videoKey = await enviarParaR2(video, "video", setProgresso);
+      if (fonte === "upload" && video) {
+        // Duração (já validada) e upload do vídeo para o R2.
+        duracao = await lerDuracaoVideo(video);
+        setEtapa("enviando-video");
+        setProgresso(0);
+        videoKey = await enviarParaR2(video, "video", setProgresso);
+      }
 
-      // 3) upload da thumbnail (opcional)
+      // Upload da miniatura (opcional no upload, obrigatória no YouTube).
       let thumbKey = "";
       if (thumb) {
         setEtapa("enviando-thumb");
@@ -98,19 +150,25 @@ export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) 
         thumbKey = await enviarParaR2(thumb, "imagem", setProgresso);
       }
 
-      // 4) confirma a criação da aula
+      // Confirma a criação da aula.
       setEtapa("salvando");
+      const corpo: Record<string, unknown> = {
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        thumb_key: thumbKey,
+        ...(ehAdmin ? { postar_como: postarComo } : {}),
+      };
+      if (fonte === "upload" && video) {
+        corpo.video_key = videoKey;
+        corpo.duracao_seg = duracao;
+        corpo.tamanho_bytes = video.size;
+      } else {
+        corpo.youtube_url = youtubeUrl.trim();
+      }
+
       const aula = await apiAuthJson<Aula>("/api/aulas/", {
         method: "POST",
-        body: JSON.stringify({
-          titulo: titulo.trim(),
-          descricao: descricao.trim(),
-          video_key: videoKey,
-          thumb_key: thumbKey,
-          duracao_seg: duracao,
-          tamanho_bytes: video.size,
-          ...(ehAdmin ? { postar_como: postarComo } : {}),
-        }),
+        body: JSON.stringify(corpo),
       });
       onCriada(aula);
     } catch (err) {
@@ -217,36 +275,103 @@ export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) 
             />
           </div>
 
-          {/* Vídeo */}
+          {/* Conteúdo: upload de vídeo OU link do YouTube */}
           <div>
             <span className="mb-1.5 block text-[13px] font-semibold text-tinta">
-              Vídeo (MP4 ou WebM, até 200 MB e 10 min)
+              Conteúdo
             </span>
-            <button
-              type="button"
-              disabled={enviando}
-              onClick={() => videoInput.current?.click()}
-              className="flex w-full items-center gap-3 rounded-chip border border-dashed border-tinta-suave/60 bg-fundo-alt px-3.5 py-3 text-left text-[14px] text-tinta-suave hover:border-azul-elas disabled:opacity-50"
+            <div
+              role="tablist"
+              aria-label="Fonte do vídeo"
+              className="mb-3 flex gap-2"
             >
-              <FileVideo className="h-5 w-5 shrink-0 text-azul-elas" />
-              <span className="truncate">
-                {video ? video.name : "Escolher vídeo"}
-              </span>
-            </button>
-            <input
-              ref={videoInput}
-              type="file"
-              accept="video/mp4,video/webm"
-              className="hidden"
-              onChange={(e) => escolherVideo(e.target.files?.[0] ?? null)}
-            />
-            {erroVideo && <p className="mt-1 text-[12px] text-perigo">{erroVideo}</p>}
+              <button
+                type="button"
+                role="tab"
+                aria-selected={fonte === "upload"}
+                disabled={enviando}
+                onClick={() => setFonte("upload")}
+                className={`flex-1 rounded-chip border px-3 py-2 text-[13px] font-semibold transition disabled:opacity-50 ${
+                  fonte === "upload"
+                    ? "border-azul-elas bg-azul-elas-suave text-azul-elas"
+                    : "border-tinta-suave/50 bg-fundo-alt text-tinta-suave hover:border-azul-elas"
+                }`}
+              >
+                <FileVideo className="mr-1 inline h-4 w-4" /> Upload de vídeo
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={fonte === "youtube"}
+                disabled={enviando}
+                onClick={() => setFonte("youtube")}
+                className={`flex-1 rounded-chip border px-3 py-2 text-[13px] font-semibold transition disabled:opacity-50 ${
+                  fonte === "youtube"
+                    ? "border-azul-elas bg-azul-elas-suave text-azul-elas"
+                    : "border-tinta-suave/50 bg-fundo-alt text-tinta-suave hover:border-azul-elas"
+                }`}
+              >
+                <MonitorPlay className="mr-1 inline h-4 w-4" /> Link do YouTube
+              </button>
+            </div>
+
+            {fonte === "upload" ? (
+              <div>
+                <button
+                  type="button"
+                  disabled={enviando}
+                  onClick={() => videoInput.current?.click()}
+                  className="flex w-full items-center gap-3 rounded-chip border border-dashed border-tinta-suave/60 bg-fundo-alt px-3.5 py-3 text-left text-[14px] text-tinta-suave hover:border-azul-elas disabled:opacity-50"
+                >
+                  <FileVideo className="h-5 w-5 shrink-0 text-azul-elas" />
+                  <span className="truncate">
+                    {video ? video.name : "Escolher vídeo (MP4 ou WebM)"}
+                  </span>
+                </button>
+                <input
+                  ref={videoInput}
+                  type="file"
+                  accept="video/mp4,video/webm"
+                  className="hidden"
+                  onChange={(e) => escolherVideo(e.target.files?.[0] ?? null)}
+                />
+                <p className="mt-1 text-[12px] text-tinta-suave">
+                  Até 200 MB e 10 minutos.
+                </p>
+                {erroVideo && (
+                  <p className="mt-1 text-[12px] text-perigo">{erroVideo}</p>
+                )}
+              </div>
+            ) : (
+              <div>
+                <input
+                  type="url"
+                  inputMode="url"
+                  disabled={enviando}
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  aria-label="Link do vídeo no YouTube"
+                  className="h-12 w-full rounded-chip border border-tinta-suave/50 bg-fundo-alt px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70 focus:border-azul-elas focus:outline-none focus:ring-2 focus:ring-azul-elas/30 disabled:opacity-50"
+                />
+                <p className="mt-1 text-[12px] text-tinta-suave">
+                  Cole o link do vídeo. Ao abrir a aula, o vídeo toca dentro do
+                  app.
+                </p>
+                {erroYoutube && (
+                  <p className="mt-1 text-[12px] text-perigo">{erroYoutube}</p>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Thumbnail */}
+          {/* Miniatura */}
           <div>
             <span className="mb-1.5 block text-[13px] font-semibold text-tinta">
-              Capa (opcional, JPG/PNG/WebP até 5 MB)
+              Miniatura{" "}
+              <span className="font-normal text-tinta-suave">
+                {fonte === "youtube" ? "(obrigatória)" : "(opcional)"}
+              </span>
             </span>
             <button
               type="button"
@@ -256,7 +381,7 @@ export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) 
             >
               <ImagePlus className="h-5 w-5 shrink-0 text-azul-elas" />
               <span className="truncate">
-                {thumb ? thumb.name : "Escolher capa"}
+                {thumb ? thumb.name : "Escolher imagem de capa"}
               </span>
             </button>
             <input
@@ -266,6 +391,9 @@ export function UploadAulaModal({ onFechar, onCriada, ehAdmin = false }: Props) 
               className="hidden"
               onChange={(e) => escolherThumb(e.target.files?.[0] ?? null)}
             />
+            <p className="mt-1 text-[12px] text-tinta-suave">
+              Proporção 16:9, ideal 1280×720 px. JPG, PNG ou WebP até 5 MB.
+            </p>
             {erroThumb && <p className="mt-1 text-[12px] text-perigo">{erroThumb}</p>}
           </div>
 

@@ -66,7 +66,8 @@ class AulasView(APIView):
         ser.is_valid(raise_exception=True)
         dados = ser.validated_data
 
-        video_key = dados["video_key"]
+        video_key = (dados.get("video_key") or "").strip()
+        youtube_id = dados.get("youtube_id", "")  # já validado pelo serializer
         thumb_key = dados.get("thumb_key", "")
 
         # A administradora escolhe publicar como Por ELAS (origem "ia", sem
@@ -87,7 +88,8 @@ class AulasView(APIView):
             titulo=dados["titulo"],
             descricao=dados.get("descricao", ""),
             video_key=video_key,
-            video_url=storage.url_publica(video_key),
+            video_url=storage.url_publica(video_key) if video_key else "",
+            youtube_id=youtube_id,
             thumb_key=thumb_key,
             thumb_url=storage.url_publica(thumb_key) if thumb_key else "",
             duracao_seg=dados.get("duracao_seg", 0),

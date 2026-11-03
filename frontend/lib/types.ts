@@ -57,6 +57,8 @@ export interface Aula {
   empresa_logo: string;
   autor_nome: string;
   video_url: string;
+  /** Quando preenchido, a aula é um vídeo do YouTube (player por embed). */
+  youtube_id: string;
   thumb_url: string;
   duracao_seg: number;
   tamanho_bytes: number;
