@@ -20,6 +20,7 @@ export interface Me {
   foto: string;
   descricao: string;
   linkedin: string;
+  is_admin: boolean;
   precisa_username: boolean;
   termos_aceitos_em: string | null;
   total_seguidores: number;

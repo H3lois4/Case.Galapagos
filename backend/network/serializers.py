@@ -48,6 +48,8 @@ class CommentSerializer(serializers.ModelSerializer):
         viewer = self.context.get("viewer")
         if not viewer:
             return False
+        if getattr(viewer, "is_admin", False):
+            return True
         # dono do comentário OU dono do post
         return obj.autor_id == viewer.pk or obj.post.autor_id == viewer.pk
 
@@ -92,6 +94,9 @@ class PostSerializer(serializers.ModelSerializer):
         viewer = self.context.get("viewer")
         if not viewer:
             return False
+        # Administradora pode excluir qualquer post.
+        if getattr(viewer, "is_admin", False):
+            return True
         if obj.autor_id and obj.autor_id == viewer.pk:
             return True
         # membro da empresa dona do post
@@ -102,6 +107,14 @@ class PostSerializer(serializers.ModelSerializer):
 
 class PostCreateSerializer(serializers.ModelSerializer):
     imagem_key = serializers.CharField(required=False, allow_blank=True)
+    # Só tem efeito para administradoras: define em nome de quem o post sai.
+    # "usuaria" (padrão) = a própria; "empresa" = Galapagos; "ia" = Por ELAS.
+    postar_como = serializers.ChoiceField(
+        choices=["usuaria", "empresa", "ia"], required=False, default="usuaria"
+    )
+    # Campos extras de notícia (úteis quando o admin publica como Por ELAS).
+    categoria = serializers.CharField(required=False, allow_blank=True)
+    fonte_url = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = Post
@@ -113,6 +126,9 @@ class PostCreateSerializer(serializers.ModelSerializer):
             "vaga_local",
             "vaga_link",
             "titulo",
+            "categoria",
+            "fonte_url",
+            "postar_como",
         )
 
     def validate_texto(self, value):

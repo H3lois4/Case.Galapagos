@@ -53,6 +53,8 @@ export default function RedePage() {
   }
 
   const podeEmpresa = me?.empresa_status === "aprovada";
+  const ehAdmin = !!me?.is_admin;
+  const nomeUsuaria = me?.nome_exibicao || me?.username || "Você";
 
   return (
     <div className="space-y-5 py-4">
@@ -60,7 +62,12 @@ export default function RedePage() {
 
       {noticias.length > 0 && <CarrosselNoticias noticias={noticias} />}
 
-      <NovoPost podeEmpresa={!!podeEmpresa} onCriado={aoCriar} />
+      <NovoPost
+        podeEmpresa={!!podeEmpresa}
+        ehAdmin={ehAdmin}
+        nomeUsuaria={nomeUsuaria}
+        onCriado={aoCriar}
+      />
 
       {/* Filtros */}
       <div className="flex gap-2" role="tablist" aria-label="Filtrar feed">

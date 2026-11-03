@@ -9,16 +9,25 @@ import { apiAuthJson } from "@/lib/api";
 import { comprimirImagem, enviarParaR2, validarArquivo } from "@/lib/upload";
 import type { Post, TipoPost } from "@/lib/types";
 
+type PostarComo = "usuaria" | "empresa" | "ia";
+
 export function NovoPost({
   podeEmpresa,
+  ehAdmin = false,
+  nomeUsuaria = "Você",
   onCriado,
 }: {
   podeEmpresa: boolean;
+  ehAdmin?: boolean;
+  nomeUsuaria?: string;
   onCriado: (post: Post) => void;
 }) {
   const [tipo, setTipo] = useState<TipoPost>("post");
+  const [postarComo, setPostarComo] = useState<PostarComo>("usuaria");
   const [texto, setTexto] = useState("");
   const [titulo, setTitulo] = useState("");
+  const [categoria, setCategoria] = useState("economia");
+  const [fonteUrl, setFonteUrl] = useState("");
   const [vagaCargo, setVagaCargo] = useState("");
   const [vagaLocal, setVagaLocal] = useState("");
   const [vagaLink, setVagaLink] = useState("");
@@ -124,20 +133,27 @@ export function NovoPost({
           texto: texto.trim(),
           imagem_key: imagemKey,
           titulo: titulo.trim(),
+          categoria: tipo === "noticia" ? categoria : "",
+          fonte_url: tipo === "noticia" ? fonteUrl.trim() : "",
           vaga_cargo: vagaCargo.trim(),
           vaga_local: vagaLocal.trim(),
           vaga_link: vagaLink.trim(),
+          ...(ehAdmin ? { postar_como: postarComo } : {}),
         }),
       });
       onCriado(post);
       // limpa
       setTexto("");
       setTitulo("");
+      setCategoria("economia");
+      setFonteUrl("");
       setVagaCargo("");
       setVagaLocal("");
       setVagaLink("");
       setImagem(null);
+      setPrevia(null);
       setTipo("post");
+      setPostarComo("usuaria");
     } catch (err) {
       const ex = err as { corpo?: { detail?: string } };
       setErro(ex.corpo?.detail ?? "Não foi possível publicar.");
@@ -157,7 +173,37 @@ export function NovoPost({
       onSubmit={publicar}
       className="rounded-card border border-borda bg-fundo p-4 shadow-[var(--sombra-card)]"
     >
-      {podeEmpresa && (
+      {/* Administradora escolhe em nome de quem publicar. */}
+      {ehAdmin && (
+        <div className="mb-3">
+          <span className="mb-1.5 block text-[12px] font-semibold text-tinta-suave">
+            Publicar como
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {([
+              { v: "ia", label: "Por ELAS" },
+              { v: "empresa", label: "Galapagos Capital" },
+              { v: "usuaria", label: nomeUsuaria },
+            ] as { v: PostarComo; label: string }[]).map((o) => (
+              <button
+                key={o.v}
+                type="button"
+                onClick={() => setPostarComo(o.v)}
+                className={cn(
+                  "rounded-pill border px-3 py-1 text-[12px] font-semibold transition-colors",
+                  postarComo === o.v
+                    ? "border-rosa-elas bg-rosa-elas text-tinta"
+                    : "border-borda text-tinta-suave hover:border-rosa-elas/60",
+                )}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {(podeEmpresa || ehAdmin) && (
         <div className="mb-3 flex gap-2">
           {tipos.map((t) => (
             <button
@@ -178,14 +224,42 @@ export function NovoPost({
       )}
 
       {tipo === "noticia" && (
-        <Input
-          name="titulo"
-          rotulo="Título da notícia"
-          value={titulo}
-          maxLength={200}
-          onChange={(e) => setTitulo(e.target.value)}
-          className="mb-2"
-        />
+        <div className="mb-2 space-y-2">
+          <Input
+            name="titulo"
+            rotulo="Título da notícia"
+            value={titulo}
+            maxLength={200}
+            onChange={(e) => setTitulo(e.target.value)}
+          />
+          <div className="w-full">
+            <label
+              htmlFor="categoria"
+              className="mb-1.5 block text-[13px] font-semibold text-tinta"
+            >
+              Categoria
+            </label>
+            <select
+              id="categoria"
+              value={categoria}
+              onChange={(e) => setCategoria(e.target.value)}
+              className="h-11 w-full rounded-chip border border-tinta-suave/50 bg-fundo-alt px-3 text-[15px] text-tinta focus:border-azul-elas focus:outline-none"
+            >
+              {["economia", "juros", "bolsa", "cambio", "cripto", "carreira"].map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <Input
+            name="fonte_url"
+            rotulo="Link da notícia fonte"
+            placeholder="https://..."
+            value={fonteUrl}
+            onChange={(e) => setFonteUrl(e.target.value)}
+          />
+        </div>
       )}
 
       {tipo === "vaga" && (

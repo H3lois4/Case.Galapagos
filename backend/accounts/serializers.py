@@ -38,6 +38,7 @@ class MeSerializer(serializers.ModelSerializer):
             "foto",
             "descricao",
             "linkedin",
+            "is_admin",
             "precisa_username",
             "termos_aceitos_em",
             "total_seguidores",
@@ -48,6 +49,7 @@ class MeSerializer(serializers.ModelSerializer):
             "email",
             "username",
             "account_type",
+            "is_admin",
             "termos_aceitos_em",
             "criado_em",
         )

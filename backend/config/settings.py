@@ -253,6 +253,12 @@ SUPABASE_PROJECT_URL = os.environ.get("SUPABASE_PROJECT_URL", "").rstrip("/")
 SUPABASE_JWT_AUD = os.environ.get("SUPABASE_JWT_AUD", "authenticated")
 SUPABASE_JWKS_TTL = int(os.environ.get("SUPABASE_JWKS_TTL", "600"))
 
+# E-mails que viram administradoras do app automaticamente no primeiro acesso.
+ADMIN_EMAILS = {
+    e.strip().lower()
+    for e in env_list("ADMIN_EMAILS", "helomatheus05@gmail.com")
+}
+
 
 # ---------------------------------------------------------------------------
 # Cloudflare R2 (armazenamento de vídeos e imagens, compatível com S3)

@@ -129,6 +129,13 @@ class SupabaseJWTAuthentication(authentication.BaseAuthentication):
         if email and profile.email != email:
             profile.email = email
             profile.save(update_fields=["email"])
+
+        # Promove a administradora quem está na lista ADMIN_EMAILS (idempotente).
+        admin_emails = getattr(settings, "ADMIN_EMAILS", set())
+        deve_ser_admin = bool(email) and email.strip().lower() in admin_emails
+        if deve_ser_admin and not profile.is_admin:
+            profile.is_admin = True
+            profile.save(update_fields=["is_admin"])
         return profile
 
     def authenticate_header(self, request):

@@ -115,17 +115,6 @@ export default async function PostPublicoPage({
           </div>
         )}
 
-        {post.fonte_url && (
-          <a
-            href={post.fonte_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block text-[13px] text-tinta-suave hover:underline"
-          >
-            Fonte original
-          </a>
-        )}
-
         <div className="mt-5 flex items-center justify-between border-t border-borda pt-4">
           <span className="text-[13px] text-tinta-suave">
             ❤ {post.curtidas_count} · 💬 {post.comentarios_count}
@@ -135,12 +124,23 @@ export default async function PostPublicoPage({
       </article>
 
       <div className="mt-6 text-center">
-        <Link
-          href="/rede"
-          className="inline-flex items-center justify-center rounded-botao bg-azul-elas px-5 py-3 text-[15px] font-semibold text-white hover:bg-azul-elas-escuro"
-        >
-          Abrir no app
-        </Link>
+        {post.tipo === "noticia" && post.fonte_url ? (
+          <a
+            href={post.fonte_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-botao bg-azul-elas px-5 py-3 text-[15px] font-semibold text-white hover:bg-azul-elas-escuro"
+          >
+            Ver notícia
+          </a>
+        ) : (
+          <Link
+            href="/rede"
+            className="inline-flex items-center justify-center rounded-botao bg-azul-elas px-5 py-3 text-[15px] font-semibold text-white hover:bg-azul-elas-escuro"
+          >
+            Abrir no app
+          </Link>
+        )}
       </div>
     </main>
   );

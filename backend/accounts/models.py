@@ -81,6 +81,10 @@ class Profile(models.Model):
     descricao = models.CharField(max_length=200, blank=True)
     linkedin = models.URLField(blank=True)
 
+    # Administradora do app (equipe Por ELAS): pode postar como Por ELAS, como
+    # empresa ou como a própria usuária, e moderar/excluir qualquer post.
+    is_admin = models.BooleanField(default=False)
+
     termos_aceitos_em = models.DateTimeField(null=True, blank=True)
     termos_versao = models.CharField(max_length=20, blank=True)
 

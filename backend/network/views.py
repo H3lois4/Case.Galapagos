@@ -83,10 +83,12 @@ class PostsView(APIView):
         ser.is_valid(raise_exception=True)
         dados = ser.validated_data
         tipo = dados.get("tipo", Post.TIPO_POST)
+        eh_admin = getattr(profile, "is_admin", False)
+        postar_como = dados.get("postar_como", "usuaria") if eh_admin else "usuaria"
 
-        # vaga/noticia só para empresa aprovada
+        # vaga/noticia: empresa aprovada OU administradora podem publicar.
         if tipo in (Post.TIPO_VAGA, Post.TIPO_NOTICIA):
-            if not profile.empresa_aprovada:
+            if not (profile.empresa_aprovada or eh_admin):
                 return Response(
                     {"code": "empresa_requerida", "detail": "Apenas empresas aprovadas podem publicar isso."},
                     status=status.HTTP_403_FORBIDDEN,
@@ -105,13 +107,34 @@ class PostsView(APIView):
             tipo=tipo,
             texto=texto,
             titulo=(dados.get("titulo") or "").strip(),
+            categoria=(dados.get("categoria") or "").strip(),
+            fonte_url=(dados.get("fonte_url") or "").strip(),
             vaga_cargo=(dados.get("vaga_cargo") or "").strip(),
             vaga_local=(dados.get("vaga_local") or "").strip(),
             vaga_link=(dados.get("vaga_link") or "").strip(),
         )
-        # posts de empresa saem "em nome da empresa"
-        if profile.empresa_aprovada and tipo in (Post.TIPO_VAGA, Post.TIPO_NOTICIA):
+
+        # Define em nome de quem o post sai.
+        if eh_admin and postar_como == "ia":
+            # Por ELAS (conta oficial): sem autor/empresa, origem_ia.
+            post.autor = None
+            post.company = None
+            post.origem_ia = True
+        elif eh_admin and postar_como == "empresa":
+            # Em nome da empresa (Galapagos). Usa a empresa da admin ou a 1ª aprovada.
+            from accounts.models import Company
+
+            empresa = profile.company or Company.objects.filter(
+                status=Company.STATUS_APROVADA
+            ).order_by("id").first()
+            post.company = empresa
+        elif not eh_admin and profile.empresa_aprovada and tipo in (
+            Post.TIPO_VAGA,
+            Post.TIPO_NOTICIA,
+        ):
+            # Fluxo normal de empresa aprovada: posts saem em nome da empresa.
             post.company = profile.company
+
         if imagem_key:
             post.imagem_key = imagem_key
             post.imagem_url = storage.url_publica(imagem_key)
@@ -156,8 +179,10 @@ class PostDetailView(APIView):
     def delete(self, request, pk):
         profile = _profile(request)
         post = get_object_or_404(Post, pk=pk)
-        dono = (post.autor_id == profile.pk) or (
-            post.company_id and post.company_id == profile.company_id
+        dono = (
+            getattr(profile, "is_admin", False)
+            or (post.autor_id == profile.pk)
+            or (post.company_id and post.company_id == profile.company_id)
         )
         if not dono:
             return Response(
@@ -232,7 +257,11 @@ class ComentarioDetailView(APIView):
     def delete(self, request, pk):
         profile = _profile(request)
         comentario = get_object_or_404(Comment.objects.select_related("post"), pk=pk)
-        dono = comentario.autor_id == profile.pk or comentario.post.autor_id == profile.pk
+        dono = (
+            getattr(profile, "is_admin", False)
+            or comentario.autor_id == profile.pk
+            or comentario.post.autor_id == profile.pk
+        )
         if not dono:
             return Response(
                 {"detail": "Sem permissão para excluir este comentário."},
