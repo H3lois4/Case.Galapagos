@@ -10,8 +10,7 @@
     "soft_skills": ["Resiliência", "Atenção a detalhes", "Comunicação", "Trabalho sob pressão"],
     "cargos_entrada": ["Estágio", "Analista"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista de M&A", "linkedin": "https://www.linkedin.com/"},
-      {"nome": "Mentora (exemplo)", "cargo": "Associate de ECM", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Anna Carolina Straube Caruzo", "cargo": "Sócia de Investment Banking", "linkedin": "https://www.linkedin.com/in/anna-carolina-straube-caruzo-79416110/"}
     ],
     "ordem": 1
   },
@@ -26,7 +25,7 @@
     "soft_skills": ["Disciplina", "Pensamento crítico", "Visão de longo prazo"],
     "cargos_entrada": ["Estágio", "Analista de investimentos"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Gestora de fundos", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Karina Andrade Aly", "cargo": "Sócia", "linkedin": "https://www.linkedin.com/in/karina-andrade-aly-94972b69/"}
     ],
     "ordem": 2
   },
@@ -41,7 +40,7 @@
     "soft_skills": ["Relacionamento", "Escuta ativa", "Confiança", "Ética"],
     "cargos_entrada": ["Assistente", "Banker júnior"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Private Banker", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Mari Emmanouilides", "cargo": "Sócia-diretora de Wealth Management", "linkedin": "https://www.linkedin.com/in/mari-emmanouilides-cfp-cga-98047341/"}
     ],
     "ordem": 3
   },
@@ -55,9 +54,6 @@
     "hard_skills": ["Programação (Python/Java)", "Bancos de dados", "APIs", "Versionamento (Git)"],
     "soft_skills": ["Resolução de problemas", "Colaboração", "Aprendizado contínuo"],
     "cargos_entrada": ["Estágio", "Desenvolvedora júnior", "Analista de dados júnior"],
-    "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Engenheira de software", "linkedin": "https://www.linkedin.com/"}
-    ],
     "ordem": 4
   },
   {
@@ -70,9 +66,6 @@
     "hard_skills": ["Produtos de mercado", "Estatística", "Leitura de mercado", "Excel"],
     "soft_skills": ["Agilidade", "Controle emocional", "Comunicação direta"],
     "cargos_entrada": ["Estágio", "Trainee de mesa"],
-    "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Trader", "linkedin": "https://www.linkedin.com/"}
-    ],
     "ordem": 5
   },
   {
@@ -85,9 +78,6 @@
     "hard_skills": ["Cálculo e probabilidade", "Programação (Python/C++)", "Modelagem estocástica", "Machine learning"],
     "soft_skills": ["Rigor analítico", "Curiosidade", "Comunicação de ideias complexas"],
     "cargos_entrada": ["Estágio quant", "Analista quantitativo júnior"],
-    "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista quantitativa", "linkedin": "https://www.linkedin.com/"}
-    ],
     "ordem": 6
   },
   {
@@ -101,7 +91,7 @@
     "soft_skills": ["Pensamento crítico", "Comunicação escrita", "Curiosidade"],
     "cargos_entrada": ["Estágio", "Analista júnior de research"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista de research", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Marina Benvenuto Chicchi", "cargo": "Economista", "linkedin": "https://www.linkedin.com/in/marina-benvenuto-chicchi-3487a8203/"}
     ],
     "ordem": 7
   },
@@ -116,7 +106,7 @@
     "soft_skills": ["Ética", "Atenção a detalhes", "Firmeza", "Comunicação"],
     "cargos_entrada": ["Estágio", "Analista de risco/compliance júnior"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista de Compliance", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Andrea Cristiane Barbosa", "cargo": "Compliance & Operations Officer", "linkedin": "https://www.linkedin.com/in/andrea-cristiane-barbosa-12610977/"}
     ],
     "ordem": 8
   },
@@ -131,7 +121,7 @@
     "soft_skills": ["Julgamento", "Atenção a detalhes", "Negociação"],
     "cargos_entrada": ["Estágio", "Analista de crédito júnior"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista de Crédito", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Giuliana de Souza Holanda", "cargo": "Analista de Crédito", "linkedin": "https://www.linkedin.com/in/giuliana-de-souza-holanda-132a4b23/"}
     ],
     "ordem": 9
   },
@@ -146,7 +136,7 @@
     "soft_skills": ["Comunicação", "Organização", "Diplomacia"],
     "cargos_entrada": ["Estágio", "Analista de RI júnior"],
     "mulheres": [
-      {"nome": "Mentora (exemplo)", "cargo": "Analista de RI", "linkedin": "https://www.linkedin.com/"}
+      {"nome": "Dominique Igel", "cargo": "Sócia de Relações com Investidores e Gestão de Negócios", "linkedin": "https://www.linkedin.com/in/domiigel/"}
     ],
     "ordem": 10
   }
