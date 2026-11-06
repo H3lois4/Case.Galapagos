@@ -20,6 +20,11 @@ urlpatterns = [
         views.ComentarioDetailView.as_view(),
         name="rede-comentario",
     ),
+    path(
+        "rede/imagem-upload-url/",
+        views.ImagemUploadUrlView.as_view(),
+        name="rede-imagem-upload-url",
+    ),
     path("rede/noticias/", views.NoticiasView.as_view(), name="rede-noticias"),
     # Job da IA de notícias (Vercel Cron)
     path("ai/news/run/", views.NewsRunView.as_view(), name="ai-news-run"),

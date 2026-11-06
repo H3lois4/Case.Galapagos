@@ -46,6 +46,45 @@ class CriarPostTests(TestCase):
         self.assertEqual(resp.status_code, 201)
         self.assertEqual(resp.data["autor"]["tipo"], "usuaria")
 
+    @mock.patch("lessons.storage.presign_put", return_value="https://r2/put")
+    @mock.patch("lessons.storage.r2_configurado", return_value=True)
+    def test_pessoal_pede_url_de_imagem(self, _cfg, _presign):
+        # Usuária comum (sem empresa) pode enviar imagem para a Rede.
+        resp = _client(self.pessoal).post(
+            "/api/rede/imagem-upload-url/",
+            {"content_type": "image/jpeg", "tamanho": 1000},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.data["key"].startswith("rede/u1/"))
+
+    @mock.patch("lessons.storage.r2_configurado", return_value=True)
+    def test_url_de_imagem_recusa_video(self, _cfg):
+        resp = _client(self.pessoal).post(
+            "/api/rede/imagem-upload-url/",
+            {"content_type": "video/mp4", "tamanho": 1000},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 400)
+
+    def test_post_com_imagem_propria(self):
+        resp = _client(self.pessoal).post(
+            "/api/rede/posts/",
+            {"tipo": "post", "texto": "", "imagem_key": "rede/u1/abc.jpg"},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 201)
+
+    def test_post_recusa_imagem_de_outra_pasta(self):
+        # Chave fora da pasta da usuária (ex.: vídeo de aula) é recusada.
+        resp = _client(self.pessoal).post(
+            "/api/rede/posts/",
+            {"tipo": "post", "texto": "oi", "imagem_key": "aulas/galapagos/video.mp4"},
+            format="json",
+        )
+        self.assertEqual(resp.status_code, 400)
+        self.assertFalse(Post.objects.filter(autor=self.pessoal).exists())
+
     def test_post_vazio_sem_imagem_falha(self):
         resp = _client(self.pessoal).post(
             "/api/rede/posts/", {"tipo": "post", "texto": "   "}, format="json"

@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { apiAuthJson } from "@/lib/api";
-import { comprimirImagem, enviarParaR2, validarArquivo } from "@/lib/upload";
+import { comprimirImagem, enviarImagemRede, validarArquivo } from "@/lib/upload";
 import type { Post, TipoPost } from "@/lib/types";
 
 type PostarComo = "usuaria" | "empresa" | "ia";
@@ -124,7 +124,7 @@ export function NovoPost({
     try {
       let imagemKey = "";
       if (imagem) {
-        imagemKey = await enviarParaR2(imagem, "imagem", () => {});
+        imagemKey = await enviarImagemRede(imagem);
       }
       const post = await apiAuthJson<Post>("/api/rede/posts/", {
         method: "POST",

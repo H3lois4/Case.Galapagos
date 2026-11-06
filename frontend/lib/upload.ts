@@ -242,6 +242,25 @@ export async function enviarParaR2(
 }
 
 /**
+ * Envia a imagem de um post da Rede ao R2 (endpoint próprio, liberado a
+ * qualquer usuária autenticada). Retorna a chave para criar o post.
+ */
+export async function enviarImagemRede(
+  arquivo: File,
+  onProgresso: (pct: number) => void = () => {},
+): Promise<string> {
+  const presign = await apiAuthJson<UploadUrlResp>("/api/rede/imagem-upload-url/", {
+    method: "POST",
+    body: JSON.stringify({
+      content_type: arquivo.type,
+      tamanho: arquivo.size,
+    }),
+  });
+  await putComProgresso(presign.url, arquivo, presign.content_type, onProgresso);
+  return presign.key;
+}
+
+/**
  * Envia a foto de perfil ao R2 (endpoint próprio, liberado a qualquer usuária)
  * e devolve a URL pública para salvar no perfil via PATCH /api/me/.
  */

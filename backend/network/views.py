@@ -29,6 +29,38 @@ def _profile(request):
     return request.user.profile
 
 
+class ImagemUploadUrlView(APIView):
+    """URL pré-assinada para a imagem de um post da Rede.
+
+    Diferente do upload de aulas (restrito a empresas aprovadas), qualquer
+    usuária autenticada pode postar com imagem. Só aceita imagem.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not storage.r2_configurado():
+            return Response(
+                {"code": "r2_indisponivel", "detail": "Armazenamento não configurado."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+        content_type = (request.data.get("content_type") or "").strip()
+        try:
+            tamanho = int(request.data.get("tamanho") or 0)
+            ext = storage.validar_upload("imagem", content_type, tamanho)
+        except (storage.UploadInvalido, ValueError, TypeError) as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        import uuid
+
+        # Chave dedicada por usuária: rede/<sub>/<uuid>.<ext>
+        key = f"rede/{_profile(request).supabase_sub}/{uuid.uuid4().hex}.{ext}"
+        url = storage.presign_put(key, content_type)
+        return Response(
+            {"url": url, "key": key, "content_type": content_type, "metodo": "PUT"}
+        )
+
+
 def _ctx(request, posts):
     """Contexto do serializer: viewer + ids curtidos pela usuária."""
     viewer = _profile(request)
@@ -94,7 +126,15 @@ class PostsView(APIView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
 
-        imagem_key = dados.get("imagem_key", "")
+        imagem_key = (dados.get("imagem_key") or "").strip()
+        # A imagem precisa ter sido enviada pela própria usuária (pasta dela no
+        # R2). Sem isso, daria para apontar para arquivos de outras pessoas ou
+        # de aulas — e excluir o post apagaria esse arquivo.
+        if imagem_key and not imagem_key.startswith(f"rede/{profile.supabase_sub}/"):
+            return Response(
+                {"detail": "Imagem inválida. Envie a imagem novamente."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         texto = (dados.get("texto") or "").strip()
         if tipo == Post.TIPO_POST and not texto and not imagem_key:
             return Response(
