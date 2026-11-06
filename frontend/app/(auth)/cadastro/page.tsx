@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -11,6 +12,7 @@ import { GraduationCap, Building2 } from "lucide-react";
 import type { AccountType } from "@/lib/types";
 
 export default function CadastroPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [tipo, setTipo] = useState<AccountType>("pessoal");
@@ -27,7 +29,7 @@ export default function CadastroPage() {
       return;
     }
     setEnviando(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
       options: {
@@ -39,6 +41,13 @@ export default function CadastroPage() {
     setEnviando(false);
     if (error) {
       setErro(error.message || "Não foi possível criar a conta.");
+      return;
+    }
+    // Sem confirmação de e-mail, o Supabase já devolve a sessão: entra direto
+    // (o RouteGuard leva para escolher o usuário). Com confirmação ligada, não
+    // há sessão e mostramos o aviso para conferir o e-mail.
+    if (data.session) {
+      router.replace("/escolher-usuario");
       return;
     }
     setSucesso(true);

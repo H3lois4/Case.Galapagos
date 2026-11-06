@@ -9,6 +9,37 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GoogleIcon } from "@/components/brand/GoogleIcon";
 
+/** Traduz o erro do Supabase Auth para uma mensagem que ajuda a pessoa. */
+function mensagemErroLogin(error: {
+  message?: string;
+  code?: string;
+  status?: number;
+}): string {
+  const msg = (error.message ?? "").toLowerCase();
+  const code = error.code ?? "";
+
+  if (code === "email_not_confirmed" || msg.includes("email not confirmed")) {
+    return "Seu e-mail ainda não foi confirmado. Confira a caixa de entrada e o spam.";
+  }
+  if (code === "invalid_credentials" || msg.includes("invalid login credentials")) {
+    return "E-mail ou senha incorretos.";
+  }
+  if (
+    error.status === 504 ||
+    error.status === 503 ||
+    error.status === 0 ||
+    msg.includes("fetch") ||
+    msg.includes("network") ||
+    msg.includes("timeout")
+  ) {
+    return "Falha de conexão com o servidor. Tente novamente em instantes.";
+  }
+  if (error.status === 429 || msg.includes("rate limit")) {
+    return "Muitas tentativas. Aguarde um pouco e tente de novo.";
+  }
+  return `Não foi possível entrar${error.message ? `: ${error.message}` : "."}`;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const { session, carregando } = useAuth();
@@ -31,7 +62,7 @@ export default function LoginPage() {
     });
     setEnviando(false);
     if (error) {
-      setErro("E-mail ou senha incorretos, ou e-mail ainda não confirmado.");
+      setErro(mensagemErroLogin(error));
       return;
     }
     router.replace("/aulas");
