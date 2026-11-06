@@ -135,7 +135,15 @@ export default function CadastroPage() {
             className="mt-0.5 h-4 w-4 accent-[var(--azul-elas)]"
           />
           <span>
-            Li e aceito os termos de uso e a política de privacidade (LGPD).
+            Li e aceito os{" "}
+            <Link href="/termos" target="_blank" className="text-azul-elas underline">
+              termos de uso
+            </Link>{" "}
+            e a{" "}
+            <Link href="/privacidade" target="_blank" className="text-azul-elas underline">
+              política de privacidade
+            </Link>{" "}
+            (LGPD).
           </span>
         </label>
 
