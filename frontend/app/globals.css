@@ -81,6 +81,26 @@
   --sombra-card: none;
 }
 
+/* Logo por tema: mostra só a versão do tema ativo. Mesma regra das cores:
+   segue o sistema, com override pelas classes .light / .dark no <html>. */
+.logo-tema-escuro {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .logo-tema-claro {
+    display: none;
+  }
+  :root:not(.light) .logo-tema-escuro {
+    display: block;
+  }
+}
+:root.dark .logo-tema-claro {
+  display: none;
+}
+:root.dark .logo-tema-escuro {
+  display: block;
+}
+
 /* ==========================================================================
    Mapeamento dos tokens para o Tailwind v4
    ========================================================================== */

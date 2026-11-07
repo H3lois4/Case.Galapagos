@@ -1,7 +1,8 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 
-import topo from "@/public/brand/topo-crop.png";
+import logoClaro from "@/public/brand/logo-claro.png";
+import logoEscuro from "@/public/brand/logo-escuro.png";
 
 /**
  * Símbolo da marca: dois anéis entrelaçados (um vinho, um rosa).
@@ -36,8 +37,13 @@ export function LogoMark({
 }
 
 /**
- * Logo oficial "Por Elas Finance" (imagem). Usada no cabeçalho e no menu
- * lateral, sobre fundo claro (creme), combinando com o fundo da própria arte.
+ * Logo oficial "Por Elas Finance" (imagem com fundo transparente). Usada no
+ * cabeçalho, no menu lateral e nas telas de login/cadastro.
+ *
+ * Há uma versão para cada tema: `logo-claro` (vinho/rosa, para fundo claro) e
+ * `logo-escuro` (tons claros, para fundo escuro). As duas são renderizadas e o
+ * CSS (`.logo-tema-claro` / `.logo-tema-escuro` em globals.css) mostra só a
+ * do tema ativo — seguindo a preferência do celular, igual às cores do app.
  * `compacta` reduz um pouco a altura.
  */
 export function Logo({
@@ -47,16 +53,25 @@ export function Logo({
   className?: string;
   compacta?: boolean;
 }) {
+  const classes = cn(
+    "w-auto object-contain",
+    compacta ? "h-7" : "h-9",
+    className,
+  );
   return (
-    <Image
-      src={topo}
-      alt="Por Elas finance"
-      priority
-      className={cn(
-        "w-auto object-contain",
-        compacta ? "h-7" : "h-9",
-        className,
-      )}
-    />
+    <>
+      <Image
+        src={logoClaro}
+        alt="Por Elas finance"
+        priority
+        className={cn("logo-tema-claro", classes)}
+      />
+      <Image
+        src={logoEscuro}
+        alt="Por Elas finance"
+        priority
+        className={cn("logo-tema-escuro", classes)}
+      />
+    </>
   );
 }
