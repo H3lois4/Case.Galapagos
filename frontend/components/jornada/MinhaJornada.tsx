@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/Card";
 import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
 import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
 import { SimuladoReviewModal } from "@/components/pratica/SimuladoReviewModal";
+import { EntrevistaReviewModal } from "@/components/pratica/EntrevistaReviewModal";
 import { apiAuthJson } from "@/lib/api";
 import type {
   EntrevistaHistorico,
@@ -65,6 +66,7 @@ export function MinhaJornada({ titulo = "Minha Jornada" }: { titulo?: string }) 
   const [entrevistas, setEntrevistas] = useState<EntrevistaHistorico[]>([]);
   const [nomesTemas, setNomesTemas] = useState<Record<string, string>>({});
   const [simuladoAberto, setSimuladoAberto] = useState<number | null>(null);
+  const [entrevistaAberta, setEntrevistaAberta] = useState<number | null>(null);
 
   useEffect(() => {
     // Plano de carreira (pode não existir → 404, tratado como "sem plano")
@@ -155,12 +157,18 @@ export function MinhaJornada({ titulo = "Minha Jornada" }: { titulo?: string }) 
         ) : (
           <ul className="mt-2 space-y-1 text-[13px]">
             {entrevistas.slice(0, 5).map((e) => (
-              <li key={e.id} className="flex justify-between gap-3 px-2 py-1 text-tinta">
-                <span className="truncate">{e.vaga}</span>
-                <span className="shrink-0 text-tinta-suave">
-                  {e.nota_geral != null ? `${e.nota_geral}/10 · ` : ""}
-                  {dataCurta(e.criado_em)}
-                </span>
+              <li key={e.id}>
+                <button
+                  type="button"
+                  onClick={() => setEntrevistaAberta(e.id)}
+                  className="flex w-full items-center justify-between gap-3 rounded-chip px-2 py-1.5 text-left text-tinta transition-colors hover:bg-fundo-alt"
+                >
+                  <span className="truncate">{e.vaga}</span>
+                  <span className="shrink-0 text-tinta-suave">
+                    {e.nota_geral != null ? `${e.nota_geral}/10 · ` : "Sem feedback · "}
+                    {dataCurta(e.criado_em)}
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -171,6 +179,27 @@ export function MinhaJornada({ titulo = "Minha Jornada" }: { titulo?: string }) 
         <SimuladoReviewModal
           attemptId={simuladoAberto}
           onFechar={() => setSimuladoAberto(null)}
+        />
+      )}
+
+      {entrevistaAberta !== null && (
+        <EntrevistaReviewModal
+          entrevistaId={entrevistaAberta}
+          onFechar={() => setEntrevistaAberta(null)}
+          onRelatorioGerado={(atualizada) =>
+            // Atualiza a nota na lista sem recarregar.
+            setEntrevistas((lista) =>
+              lista.map((e) =>
+                e.id === atualizada.id
+                  ? {
+                      ...e,
+                      nota_geral: atualizada.nota_geral,
+                      finalizado_em: atualizada.finalizado_em,
+                    }
+                  : e,
+              ),
+            )
+          }
         />
       )}
     </Card>
