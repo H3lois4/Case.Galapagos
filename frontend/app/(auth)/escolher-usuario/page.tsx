@@ -58,7 +58,7 @@ export default function EscolherUsuarioPage() {
     });
     setEnviando(false);
     if (res.ok) {
-      router.replace("/aulas");
+      router.replace("/home");
     } else {
       const corpo = await res.json().catch(() => null);
       setMsg(corpo?.username?.[0] ?? "Não foi possível salvar.");

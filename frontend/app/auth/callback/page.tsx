@@ -20,7 +20,7 @@ export default function AuthCallbackPage() {
       tentativas += 1;
       if (data.session) {
         clearInterval(timer);
-        router.replace("/aulas");
+        router.replace("/home");
       } else if (tentativas > 20) {
         clearInterval(timer);
         router.replace("/login");

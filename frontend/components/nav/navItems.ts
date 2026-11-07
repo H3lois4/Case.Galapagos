@@ -1,4 +1,5 @@
 import {
+  House,
   GraduationCap,
   Compass,
   MessageCircleHeart,
@@ -14,6 +15,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
+  { href: "/home", rotulo: "Início", Icone: House },
   { href: "/aulas", rotulo: "Aulas", Icone: GraduationCap },
   { href: "/carreira", rotulo: "Carreira", Icone: Compass },
   { href: "/mentoria", rotulo: "Mentoria", Icone: MessageCircleHeart },

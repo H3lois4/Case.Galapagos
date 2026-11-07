@@ -22,7 +22,7 @@ export default function RedefinirSenhaPage() {
       setErro("Não foi possível redefinir. Abra o link do e-mail novamente.");
       return;
     }
-    router.replace("/aulas");
+    router.replace("/home");
   }
 
   return (

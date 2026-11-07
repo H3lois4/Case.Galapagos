@@ -8,35 +8,22 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ApiStatusBadge } from "@/components/diagnostico/ApiStatusBadge";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { PlanoChecklist } from "@/components/carreira/PlanoChecklist";
-import { MinhasMentorias } from "@/components/mentoria/MinhasMentorias";
-import { SimuladoReviewModal } from "@/components/pratica/SimuladoReviewModal";
+import { MinhaJornada } from "@/components/jornada/MinhaJornada";
 import { apiAuth, apiAuthJson } from "@/lib/api";
 import { enviarFotoPerfil, validarArquivo } from "@/lib/upload";
 import { invalidarAvatarCache } from "@/components/nav/AvatarUsuaria";
-import type {
-  Me,
-  Mentoria,
-  PlanoCarreira,
-  SimuladoHistorico,
-  EntrevistaHistorico,
-} from "@/lib/types";
+import type { Me } from "@/lib/types";
 import { LogOut, Trash2, Building2, Loader2, Camera } from "lucide-react";
 
 export default function PerfilPage() {
   const router = useRouter();
   const { signOut } = useAuth();
   const [me, setMe] = useState<Me | null>(null);
-  const [plano, setPlano] = useState<PlanoCarreira | null>(null);
-  const [mentorias, setMentorias] = useState<Mentoria[]>([]);
-  const [simulados, setSimulados] = useState<SimuladoHistorico[]>([]);
-  const [entrevistas, setEntrevistas] = useState<EntrevistaHistorico[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState({ nome_exibicao: "", descricao: "", linkedin: "" });
   const [fotoProgresso, setFotoProgresso] = useState<number | null>(null);
   const [fotoErro, setFotoErro] = useState<string | null>(null);
-  const [simuladoAberto, setSimuladoAberto] = useState<number | null>(null);
 
   useEffect(() => {
     apiAuthJson<Me>("/api/me/")
@@ -49,33 +36,7 @@ export default function PerfilPage() {
         });
       })
       .finally(() => setCarregando(false));
-    // Plano de carreira (pode não existir → 404, ignorado)
-    apiAuthJson<PlanoCarreira>("/api/carreira/plano/")
-      .then(setPlano)
-      .catch(() => setPlano(null));
-    // Minhas mentorias
-    apiAuthJson<Mentoria[]>("/api/mentoria/minhas/")
-      .then(setMentorias)
-      .catch(() => setMentorias([]));
-    // Histórico de prática
-    apiAuthJson<SimuladoHistorico[]>("/api/pratica/simulados/historico/")
-      .then(setSimulados)
-      .catch(() => setSimulados([]));
-    apiAuthJson<EntrevistaHistorico[]>("/api/pratica/entrevistas/historico/")
-      .then(setEntrevistas)
-      .catch(() => setEntrevistas([]));
   }, []);
-
-  function dataCurta(iso: string): string {
-    try {
-      return new Date(iso).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "short",
-      });
-    } catch {
-      return "";
-    }
-  }
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
@@ -274,80 +235,8 @@ export default function PerfilPage() {
         </form>
       </Card>
 
-      {/* Minha jornada */}
-      <Card>
-        <h2 className="font-titulo text-[18px] font-semibold text-tinta">Minha jornada</h2>
-        <div className="mt-3">
-          <h3 className="text-[14px] font-semibold text-tinta">Plano de carreira</h3>
-          {plano ? (
-            <div className="mt-2">
-              <PlanoChecklist plano={plano} onMudou={setPlano} />
-            </div>
-          ) : (
-            <p className="mt-1 text-[13px] text-tinta-suave">
-              Você ainda não tem um plano.{" "}
-              <Link href="/carreira" className="font-semibold text-azul-elas hover:underline">
-                Montar com a IA de carreira
-              </Link>
-              .
-            </p>
-          )}
-        </div>
-        <div className="mt-4">
-          <h3 className="text-[14px] font-semibold text-tinta">Minhas mentorias</h3>
-          <div className="mt-2">
-            <MinhasMentorias mentorias={mentorias} onMudou={setMentorias} compacto />
-          </div>
-        </div>
-        <div className="mt-4">
-          <h3 className="text-[14px] font-semibold text-tinta">Simulados</h3>
-          {simulados.length === 0 ? (
-            <p className="mt-1 text-[13px] text-tinta-suave">
-              Nenhum simulado feito.{" "}
-              <Link href="/pratica" className="font-semibold text-azul-elas hover:underline">
-                Fazer um
-              </Link>
-              .
-            </p>
-          ) : (
-            <ul className="mt-2 space-y-1 text-[13px]">
-              {simulados.slice(0, 5).map((s) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => setSimuladoAberto(s.id)}
-                    className="flex w-full items-center justify-between gap-3 rounded-chip px-2 py-1.5 text-left text-tinta transition-colors hover:bg-fundo-alt"
-                  >
-                    <span className="truncate">{s.tema}</span>
-                    <span className="shrink-0 text-tinta-suave">
-                      {s.nota}/{s.total} · {dataCurta(s.criado_em)}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="mt-4">
-          <h3 className="text-[14px] font-semibold text-tinta">Entrevistas</h3>
-          {entrevistas.length === 0 ? (
-            <p className="mt-1 text-[13px] text-tinta-suave">Nenhuma entrevista feita.</p>
-          ) : (
-            <ul className="mt-2 space-y-1 text-[13px]">
-              {entrevistas.slice(0, 5).map((e) => (
-                <li key={e.id} className="flex justify-between gap-3 text-tinta">
-                  <span className="truncate">{e.vaga}</span>
-                  <span className="shrink-0 text-tinta-suave">
-                    {e.nota_geral != null ? `${e.nota_geral}/10 · ` : ""}
-                    {dataCurta(e.criado_em)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </Card>
+      {/* Minha jornada (mesmo bloco da Home) */}
+      <MinhaJornada />
 
       <Card>
         <h2 className="font-titulo text-[18px] font-semibold text-tinta">Diagnóstico</h2>
@@ -374,13 +263,6 @@ export default function PerfilPage() {
           <Trash2 className="h-4 w-4" /> Excluir conta
         </button>
       </div>
-
-      {simuladoAberto !== null && (
-        <SimuladoReviewModal
-          attemptId={simuladoAberto}
-          onFechar={() => setSimuladoAberto(null)}
-        />
-      )}
     </div>
   );
 }

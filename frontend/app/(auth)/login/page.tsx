@@ -49,7 +49,7 @@ export default function LoginPage() {
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
-    if (!carregando && session) router.replace("/aulas");
+    if (!carregando && session) router.replace("/home");
   }, [session, carregando, router]);
 
   async function entrarComEmail(e: React.FormEvent) {
@@ -65,7 +65,7 @@ export default function LoginPage() {
       setErro(mensagemErroLogin(error));
       return;
     }
-    router.replace("/aulas");
+    router.replace("/home");
   }
 
   async function entrarComGoogle() {

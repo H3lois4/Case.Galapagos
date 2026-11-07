@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Por ELAS",
     description:
       "Educação e capacitação de mulheres no mercado financeiro, com IA, mentoria e comunidade.",
-    start_url: "/aulas",
+    start_url: "/home",
     scope: "/",
     display: "standalone",
     orientation: "portrait",

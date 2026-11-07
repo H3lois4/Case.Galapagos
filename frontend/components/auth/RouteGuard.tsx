@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import { apiAuthJson } from "@/lib/api";
+import { jaViuBoasVindas } from "@/lib/boasVindas";
 import type { Me } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
@@ -16,6 +17,7 @@ interface GuardState {
  * Protege o grupo (app): exige sessão e username definido.
  * - Sem sessão → /login
  * - Com sessão, sem username → /escolher-usuario
+ * - Primeiro acesso (ainda não viu as boas-vindas) → /boas-vindas
  */
 export function RouteGuard({ children }: { children: React.ReactNode }) {
   const { session, carregando: authCarregando } = useAuth();
@@ -37,6 +39,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         if (!ativo) return;
         if (me.precisa_username) {
           router.replace("/escolher-usuario");
+          return;
+        }
+        if (!jaViuBoasVindas(session)) {
+          router.replace("/boas-vindas");
           return;
         }
         setEstado({ carregando: false, me });
