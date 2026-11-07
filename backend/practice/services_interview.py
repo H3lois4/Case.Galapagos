@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from ai.models import Conversation, Message
 from ai.providers import ProviderError, get_provider
+from ai.services import pedido_sobre_conversa
 
 from .models import Interview
 
@@ -110,9 +111,20 @@ def gerar_relatorio(interview: Interview) -> dict:
     if len(mensagens) < 2:
         raise ValueError("A entrevista ainda não tem conversa suficiente.")
 
+    # A conversa vai como transcrição numa única mensagem da usuária: o Gemini
+    # rejeita pedidos que terminam com a fala da IA (a última pergunta da
+    # entrevistadora) e, assim, o modelo avalia em vez de seguir entrevistando.
+    pedido = pedido_sobre_conversa(
+        mensagens,
+        f"Avalie a entrevista simulada abaixo para a vaga de {interview.vaga} "
+        "e gere o relatório em JSON, no formato pedido.",
+        rotulo_usuaria="Candidata",
+        rotulo_ia="Entrevistadora",
+    )
+
     try:
         provider = get_provider()
-        pedacos = list(provider.chat(mensagens, system=SYSTEM_RELATORIO, stream=False))
+        pedacos = list(provider.chat(pedido, system=SYSTEM_RELATORIO, stream=False))
     except ProviderError as exc:
         raise ValueError(str(exc)) from exc
 

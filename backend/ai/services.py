@@ -24,6 +24,36 @@ def historico_para_modelo(conversa: Conversation) -> list[dict]:
     return [{"role": m.papel, "content": m.conteudo} for m in mensagens]
 
 
+def pedido_sobre_conversa(
+    mensagens: list[dict],
+    instrucao: str,
+    rotulo_usuaria: str = "Usuária",
+    rotulo_ia: str = "IA",
+) -> list[dict]:
+    """Empacota uma conversa como UMA mensagem da usuária, para tarefas de
+    análise (resumo, relatório).
+
+    Mandar o histórico turno a turno faz o pedido terminar com a fala da IA, e
+    o Gemini rejeita isso ("Requests ending with a model turn are not
+    supported"). Além disso, o modelo tenderia a continuar a conversa em vez de
+    analisá-la. Aqui a conversa vira uma transcrição e o pedido sempre termina
+    com a usuária.
+    """
+    linhas = []
+    for m in mensagens:
+        quem = rotulo_ia if m.get("role") == Message.PAPEL_ASSISTANT else rotulo_usuaria
+        conteudo = (m.get("content") or "").strip()
+        if conteudo:
+            linhas.append(f"{quem}: {conteudo}")
+    transcricao = "\n\n".join(linhas)
+    return [
+        {
+            "role": Message.PAPEL_USER,
+            "content": f"{instrucao.strip()}\n\n--- CONVERSA ---\n{transcricao}\n--- FIM ---",
+        }
+    ]
+
+
 def titulo_a_partir(texto: str) -> str:
     """Gera um título curto a partir da primeira mensagem da usuária."""
     limpo = " ".join(texto.strip().split())
@@ -44,9 +74,10 @@ def gerar_resumo(conversa: Conversation) -> str:
         "destacando o objetivo da usuária e o que já foi combinado. Escreva só o "
         "resumo, sem rótulos."
     )
+    pedido = pedido_sobre_conversa(mensagens, "Resuma esta conversa.")
     try:
         provider = get_provider()
-        pedacos = list(provider.chat(mensagens, system=system, stream=False))
+        pedacos = list(provider.chat(pedido, system=system, stream=False))
         resumo = "".join(pedacos).strip()
         return resumo or conversa.resumo
     except ProviderError:

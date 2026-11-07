@@ -30,8 +30,10 @@ def _client(profile):
 class FakeProvider:
     def __init__(self, texto):
         self.texto = texto
+        self.recebido = None  # mensagens enviadas ao "modelo"
 
     def chat(self, messages, system, stream=True, **kw):
+        self.recebido = messages
         yield self.texto
 
 
@@ -190,6 +192,11 @@ class EntrevistaTests(TestCase):
         self.assertEqual(resp.data["nota_geral"], 8)
         interview.refresh_from_db()
         self.assertEqual(interview.nota_geral, 8)
+        # A conversa termina com a pergunta da IA, mas o pedido ao modelo tem de
+        # terminar com a usuária (o Gemini rejeita "model turn" no final).
+        self.assertEqual(fake.recebido[-1]["role"], Message.PAPEL_USER)
+        self.assertEqual(len(fake.recebido), 1)
+        self.assertIn("Entrevistadora: Primeira pergunta", fake.recebido[0]["content"])
 
     def test_relatorio_json_invalido_422(self):
         criar = _client(self.profile).post(
