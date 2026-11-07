@@ -287,7 +287,7 @@ function Resultado({
           className="fixed inset-x-0 bottom-24 z-50 mx-auto flex w-fit items-center gap-2 rounded-pill bg-tinta px-4 py-2.5 text-[13px] font-semibold text-white shadow-lg md:bottom-8"
         >
           <BookmarkCheck className="h-4 w-4 text-rosa-elas" />
-          Salvo em Minha jornada
+          Salvo em Minha Jornada, na Home
         </div>
       )}
     </div>

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ApiStatusBadge } from "@/components/diagnostico/ApiStatusBadge";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { MinhaJornada } from "@/components/jornada/MinhaJornada";
 import { apiAuth, apiAuthJson } from "@/lib/api";
 import { enviarFotoPerfil, validarArquivo } from "@/lib/upload";
 import { invalidarAvatarCache } from "@/components/nav/AvatarUsuaria";
@@ -235,8 +234,6 @@ export default function PerfilPage() {
         </form>
       </Card>
 
-      {/* Minha jornada (mesmo bloco da Home) */}
-      <MinhaJornada />
 
       <Card>
         <h2 className="font-titulo text-[18px] font-semibold text-tinta">Diagnóstico</h2>

@@ -48,7 +48,7 @@ export default function CarreiraPage() {
 
   function aoSalvarPlano() {
     setRascunho(null);
-    setAviso("Plano salvo! Veja no seu Perfil, em “Minha jornada”.");
+    setAviso("Plano salvo! Veja na Home, em “Minha Jornada”.");
   }
 
   return (

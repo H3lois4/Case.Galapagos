@@ -56,9 +56,9 @@ function Secao({
 /**
  * "Minha jornada": plano de carreira, mentorias, simulados e entrevistas da
  * usuária. Busca os próprios dados (cada fonte falha de forma independente).
- * Usado na Home e no Perfil.
+ * Exibido na Home.
  */
-export function MinhaJornada({ titulo = "Minha jornada" }: { titulo?: string }) {
+export function MinhaJornada({ titulo = "Minha Jornada" }: { titulo?: string }) {
   const [plano, setPlano] = useState<PlanoCarreira | null>(null);
   const [mentorias, setMentorias] = useState<Mentoria[]>([]);
   const [simulados, setSimulados] = useState<SimuladoHistorico[]>([]);
