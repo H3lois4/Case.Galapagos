@@ -6,6 +6,10 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "Por ELAS",
     description:
       "Educação e capacitação de mulheres no mercado financeiro, com IA, mentoria e comunidade.",
+    // `id` fixo = identidade do app instalado. Ele era derivado do start_url
+    // antigo ("/aulas"); manter esse valor faz o Chrome reconhecer o app já
+    // instalado e atualizar a página de abertura para o Início.
+    id: "/aulas",
     start_url: "/home",
     scope: "/",
     display: "standalone",

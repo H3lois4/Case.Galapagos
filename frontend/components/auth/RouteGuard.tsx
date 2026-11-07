@@ -13,6 +13,27 @@ interface GuardState {
   me: Me | null;
 }
 
+const CHAVE_ABERTURA = "porelas:app-aberto";
+
+/**
+ * Apps instalados antes da mudança abrem em "/aulas" (o iPhone guarda o
+ * endereço de abertura na instalação e não atualiza). Na ABERTURA do app
+ * instalado (1ª página da sessão, modo standalone), leva para o Início.
+ * Navegar até Aulas pelo menu continua normal.
+ */
+function abriuAppInstaladoEmAulas(pathname: string): boolean {
+  try {
+    if (sessionStorage.getItem(CHAVE_ABERTURA)) return false;
+    sessionStorage.setItem(CHAVE_ABERTURA, "1");
+    const instalado =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    return instalado && pathname === "/aulas";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Protege o grupo (app): exige sessão e username definido.
  * - Sem sessão → /login
@@ -43,6 +64,10 @@ export function RouteGuard({ children }: { children: React.ReactNode }) {
         }
         if (!jaViuBoasVindas(session)) {
           router.replace("/boas-vindas");
+          return;
+        }
+        if (abriuAppInstaladoEmAulas(pathname)) {
+          router.replace("/home");
           return;
         }
         setEstado({ carregando: false, me });
