@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Por ELAS finance — landing
+   Mesmos tokens do app (frontend/app/globals.css): vinho dominante, acentos
+   em rosa, tema claro e escuro seguindo o sistema. Os nomes `azul-elas` são
+   mantidos iguais aos do app para facilitar copiar estilos entre os dois.
+   ========================================================================== */
+
+:root {
+  --azul-elas: #990521; /* Vinho — principal */
+  --azul-elas-escuro: #6e0418;
+  --azul-elas-suave: #f7dce2; /* Blush */
+  --rosa-elas: #eb839e; /* Rosa Elas */
+  --rosa-elas-texto: #b3365e;
+  --rosa-elas-suave: #fbedef; /* Névoa rosé */
+  --fundo: #fff9f7; /* Creme */
+  --fundo-alt: #fbedef;
+  --tinta: #3a1f26; /* Ameixa */
+  --tinta-suave: #7a6168; /* Malva */
+  --borda: #ecdfe2;
+  --topo: #f8ecee;
+  --sobre-vinho: #fff9f7; /* texto sobre fundo vinho */
+
+  --sombra-card: 0 1px 2px rgba(58, 31, 38, 0.06), 0 6px 20px rgba(58, 31, 38, 0.06);
+
+  --raio-chip: 8px;
+  --raio-botao: 12px;
+  --raio-card: 20px;
+  --raio-pill: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --azul-elas: #e8829a;
+    --azul-elas-escuro: #f0a3b4;
+    --azul-elas-suave: #3a1620;
+    --rosa-elas: #eb839e;
+    --rosa-elas-texto: #f2a0b4;
+    --rosa-elas-suave: #2e1620;
+    --fundo: #1a1015;
+    --fundo-alt: #241319;
+    --tinta: #f6ecee;
+    --tinta-suave: #c3a9b0;
+    --borda: #3a2731;
+    --topo: #241319;
+    --sobre-vinho: #1a1015;
+    --sombra-card: none;
+  }
+}
+
+/* Logo por tema (mesma regra do app) */
+.logo-tema-escuro {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  .logo-tema-claro {
+    display: none;
+  }
+  .logo-tema-escuro {
+    display: block;
+  }
+}
+
+@theme inline {
+  --color-azul-elas: var(--azul-elas);
+  --color-azul-elas-escuro: var(--azul-elas-escuro);
+  --color-azul-elas-suave: var(--azul-elas-suave);
+  --color-rosa-elas: var(--rosa-elas);
+  --color-rosa-elas-texto: var(--rosa-elas-texto);
+  --color-rosa-elas-suave: var(--rosa-elas-suave);
+  --color-fundo: var(--fundo);
+  --color-fundo-alt: var(--fundo-alt);
+  --color-tinta: var(--tinta);
+  --color-tinta-suave: var(--tinta-suave);
+  --color-borda: var(--borda);
+  --color-topo: var(--topo);
+  --color-sobre-vinho: var(--sobre-vinho);
+
+  --radius-chip: var(--raio-chip);
+  --radius-botao: var(--raio-botao);
+  --radius-card: var(--raio-card);
+  --radius-pill: var(--raio-pill);
+
+  --font-titulo: var(--font-montserrat);
+  --font-corpo: var(--font-inter);
+}
+
+html {
+  background: var(--fundo);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+.font-titulo {
+  font-family: var(--font-montserrat), system-ui, sans-serif;
+}
+
+/* Âncoras não ficam escondidas atrás do cabeçalho fixo */
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--azul-elas);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
