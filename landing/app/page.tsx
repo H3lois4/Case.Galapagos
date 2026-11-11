@@ -1,8 +1,12 @@
 import {
   ArrowRight,
+  BadgeCheck,
   BookOpen,
+  Briefcase,
   Building2,
+  CalendarCheck,
   Check,
+  HeartHandshake,
   Compass,
   GraduationCap,
   House,
@@ -179,11 +183,59 @@ const PAGINAS: Pagina[] = [
   },
 ];
 
-const EMPRESAS = [
-  "Verificação pelo e-mail corporativo",
-  "Publicar aulas, por upload de vídeo ou link do YouTube",
-  "Divulgar vagas e notícias na Rede",
-  "Cadastrar horários de mentoria com profissionais do time",
+const BENEFICIOS_EMPRESA: { Icone: LucideIcon; titulo: string; texto: string }[] = [
+  {
+    Icone: Briefcase,
+    titulo: "Vagas e notícias na Rede",
+    texto:
+      "Divulgue vagas e publique conteúdos em nome da empresa para uma comunidade de mulheres que está se preparando para o mercado financeiro.",
+  },
+  {
+    Icone: GraduationCap,
+    titulo: "Sua marca ensinando",
+    texto:
+      "Publique aulas em vídeo, por upload ou link do YouTube, com o nome da empresa em destaque na seção Aulas.",
+  },
+  {
+    Icone: CalendarCheck,
+    titulo: "Mentorias sem burocracia",
+    texto:
+      "Cadastre horários com profissionais do seu time. O agendamento, o convite no Google Agenda e o link do Meet são automáticos.",
+  },
+  {
+    Icone: Users,
+    titulo: "Conheça novos talentos",
+    texto:
+      "Acompanhe na Rede quem está estudando e treinando, com perfis públicos, descrição e LinkedIn de cada usuária.",
+  },
+  {
+    Icone: BadgeCheck,
+    titulo: "Conta verificada",
+    texto:
+      "O acesso de empresa é confirmado pelo e-mail corporativo, o que dá segurança para as usuárias e para a sua equipe.",
+  },
+  {
+    Icone: HeartHandshake,
+    titulo: "Diversidade na prática",
+    texto:
+      "Contribua de forma concreta para ter mais mulheres no mercado financeiro, com ações que vocês acompanham de perto.",
+  },
+];
+
+const PASSOS_EMPRESA: { titulo: string; texto: string }[] = [
+  {
+    titulo: "Crie a conta",
+    texto: "No cadastro, escolha a opção “Represento uma empresa”.",
+  },
+  {
+    titulo: "Verifique a empresa",
+    texto:
+      "Informe nome, site e e-mail corporativo (o CNPJ é opcional) e confirme com o código de 6 dígitos que enviamos.",
+  },
+  {
+    titulo: "Comece a participar",
+    texto: "Com a empresa aprovada, publique aulas, vagas e notícias e cadastre horários de mentoria.",
+  },
 ];
 
 const EXTRAS: { Icone: LucideIcon; titulo: string; texto: string }[] = [
@@ -262,6 +314,7 @@ export default function LandingPage() {
             <a href="#desafio" className="hover:text-azul-elas">O desafio</a>
             <a href="#como-funciona" className="hover:text-azul-elas">Como funciona</a>
             <a href="#funcionalidades" className="hover:text-azul-elas">Funcionalidades</a>
+            <a href="#empresas" className="hover:text-azul-elas">Para empresas</a>
           </nav>
           <a
             href={APP_URL}
@@ -396,27 +449,6 @@ export default function LandingPage() {
                   </ul>
                 </li>
               ))}
-
-              {/* Para empresas */}
-              <li className="flex flex-col rounded-card bg-azul-elas p-6 text-sobre-vinho">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-pill bg-sobre-vinho/15">
-                    <Building2 className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
-                  </span>
-                  <h3 className="font-titulo text-[20px] font-bold">Para empresas</h3>
-                </div>
-                <p className="mt-3 text-[15px] font-semibold">
-                  Contas verificadas de empresas do mercado financeiro ajudam a abrir portas.
-                </p>
-                <ul className="mt-3 space-y-2">
-                  {EMPRESAS.map((item) => (
-                    <li key={item} className="flex gap-2 text-[14px] leading-relaxed opacity-90">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </li>
             </ul>
 
             <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -430,6 +462,62 @@ export default function LandingPage() {
                 </li>
               ))}
             </ul>
+          </div>
+        </section>
+
+        {/* Para empresas */}
+        <section id="empresas" className="bg-fundo-alt py-20">
+          <div className="mx-auto max-w-6xl px-5">
+            <div className="mx-auto max-w-2xl text-center">
+              <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-pill bg-azul-elas text-sobre-vinho">
+                <Building2 className="h-6 w-6" strokeWidth={1.8} aria-hidden="true" />
+              </span>
+              <div className="mt-4">
+                <Rotulo>Para empresas</Rotulo>
+              </div>
+              <h2 className="mt-2 font-titulo text-[28px] font-bold leading-tight text-tinta sm:text-[34px]">
+                Abra portas e encontre novos talentos
+              </h2>
+              <p className="mt-4 text-[16px] leading-relaxed text-tinta-suave">
+                Empresas do mercado financeiro podem ensinar, orientar e contratar mulheres que estão se preparando
+                para o setor, tudo dentro do mesmo app.
+              </p>
+            </div>
+
+            <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {BENEFICIOS_EMPRESA.map(({ Icone, titulo, texto }) => (
+                <li key={titulo} className="rounded-card border border-borda bg-fundo p-6 shadow-[var(--sombra-card)]">
+                  <IconeChip Icone={Icone} />
+                  <h3 className="mt-4 font-titulo text-[17px] font-semibold text-tinta">{titulo}</h3>
+                  <p className="mt-2 text-[14px] leading-relaxed text-tinta-suave">{texto}</p>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-12 rounded-[28px] border border-borda bg-fundo p-6 shadow-[var(--sombra-card)] sm:p-10">
+              <h3 className="text-center font-titulo text-[22px] font-bold text-tinta">
+                Como a sua empresa participa
+              </h3>
+              <ol className="mt-8 grid gap-6 md:grid-cols-3">
+                {PASSOS_EMPRESA.map((p, i) => (
+                  <li key={p.titulo} className="text-center">
+                    <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-pill bg-azul-elas font-titulo text-[16px] font-bold text-sobre-vinho">
+                      {i + 1}
+                    </span>
+                    <p className="mt-3 font-titulo text-[16px] font-semibold text-tinta">{p.titulo}</p>
+                    <p className="mt-1 text-[14px] leading-relaxed text-tinta-suave">{p.texto}</p>
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-8 flex justify-center">
+                <a
+                  href={`${APP_URL}/cadastro`}
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-botao bg-azul-elas px-6 font-titulo text-[15px] font-semibold text-sobre-vinho transition-colors hover:bg-azul-elas-escuro"
+                >
+                  Cadastrar minha empresa <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </a>
+              </div>
+            </div>
           </div>
         </section>
 
