@@ -85,6 +85,16 @@ class CriarPostTests(TestCase):
         self.assertEqual(resp.status_code, 400)
         self.assertFalse(Post.objects.filter(autor=self.pessoal).exists())
 
+    def test_feed_com_imagem_filtra(self):
+        Post.objects.create(autor=self.pessoal, tipo="post", texto="sem foto")
+        com = Post.objects.create(
+            autor=self.pessoal, tipo="post", texto="com foto",
+            imagem_url="https://r2/rede/u1/a.jpg",
+        )
+        resp = _client(self.pessoal).get("/api/rede/posts/?com_imagem=1")
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual([p["id"] for p in resp.data["results"]], [com.id])
+
     def test_post_vazio_sem_imagem_falha(self):
         resp = _client(self.pessoal).post(
             "/api/rede/posts/", {"tipo": "post", "texto": "   "}, format="json"

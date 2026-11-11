@@ -103,6 +103,9 @@ class PostsView(APIView):
             qs = qs.filter(autor__username_ci=autor_username.lower())
         if empresa_slug:
             qs = qs.filter(company__slug=empresa_slug)
+        # Só posts com imagem (usado pelo carrossel "Novidades em Rede" da Home).
+        if request.query_params.get("com_imagem") in ("1", "true"):
+            qs = qs.exclude(imagem_url="")
 
         paginator = PageNumberPagination()
         page = paginator.paginate_queryset(qs, request, view=self)
