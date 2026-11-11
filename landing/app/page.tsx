@@ -259,7 +259,7 @@ export default function LandingPage() {
             <Logo className="h-9 w-auto" prioridade />
           </a>
           <nav aria-label="Seções" className="hidden items-center gap-6 text-[14px] font-semibold text-tinta-suave md:flex">
-            <a href="#problema" className="hover:text-azul-elas">O problema</a>
+            <a href="#desafio" className="hover:text-azul-elas">O desafio</a>
             <a href="#como-funciona" className="hover:text-azul-elas">Como funciona</a>
             <a href="#funcionalidades" className="hover:text-azul-elas">Funcionalidades</a>
           </nav>
@@ -305,11 +305,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Problema */}
-        <section id="problema" className="bg-fundo-alt py-20">
+        {/* Desafio */}
+        <section id="desafio" className="bg-fundo-alt py-20">
           <div className="mx-auto max-w-6xl px-5">
             <TituloSecao
-              rotulo="O problema"
+              rotulo="O desafio"
               titulo="Por que é tão difícil entrar?"
               texto="O mercado financeiro ainda é um ambiente majoritariamente masculino. Para muitas mulheres, a barreira não é capacidade: é acesso a conhecimento, a treino e a pessoas."
             />
