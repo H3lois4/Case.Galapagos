@@ -27,6 +27,29 @@ class SeedDemoTests(TestCase):
         # Uma vaga da empresa.
         self.assertTrue(Post.objects.filter(tipo=Post.TIPO_VAGA).exists())
 
+    def test_galapagos_nao_e_descrita_como_banco(self):
+        # Base que ainda tem a descrição antiga e errada.
+        Company.objects.create(
+            nome="Galapagos Capital", slug="galapagos-capital",
+            descricao="Gestora e banco de investimentos.",
+            status=Company.STATUS_APROVADA,
+        )
+        call_command("seed_demo")
+        galapagos = Company.objects.get(slug="galapagos-capital")
+        self.assertNotIn("banco", galapagos.descricao.lower())
+
+    def test_seed_preserva_descricao_escrita_pela_empresa(self):
+        Company.objects.create(
+            nome="Galapagos Capital", slug="galapagos-capital",
+            descricao="Texto escrito pela empresa.",
+            status=Company.STATUS_APROVADA,
+        )
+        call_command("seed_demo")
+        self.assertEqual(
+            Company.objects.get(slug="galapagos-capital").descricao,
+            "Texto escrito pela empresa.",
+        )
+
     def test_idempotente(self):
         call_command("seed_demo")
         posts = Post.objects.count()

@@ -23,6 +23,10 @@ from network.models import Post
 # Empresa real do app.
 GALAPAGOS_SLUG = "galapagos-capital"
 
+# Descrições antigas gravadas por versões anteriores do seed. Estavam erradas
+# (a Galapagos não é um banco) e são apagadas ao rodar o seed.
+DESCRICOES_ANTIGAS = {"Gestora e banco de investimentos."}
+
 # Notícias iniciais da conta oficial "Por ELAS" (com imagem e fonte).
 NOTICIAS = [
     {
@@ -90,11 +94,15 @@ class Command(BaseCommand):
             defaults={
                 "nome": "Galapagos Capital",
                 "dominio": "galapagoscapital.com",
-                "descricao": "Gestora e banco de investimentos.",
                 "site": "https://galapagoscapital.com",
                 "status": Company.STATUS_APROVADA,
             },
         )
+        # Remove a descrição antiga e incorreta ("banco") se ainda estiver salva.
+        # Não sobrescreve uma descrição escrita depois pela própria empresa.
+        if company.descricao.strip() in DESCRICOES_ANTIGAS:
+            company.descricao = ""
+            company.save(update_fields=["descricao"])
         self.stdout.write(f"Empresa: {company.nome}")
         return company
 
